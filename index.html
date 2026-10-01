@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DropStore: Turnaround Challenge | Simulador Gerencial</title>
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- FontAwesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <!-- Google Fonts: Space Grotesk and Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Space Grotesk"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              dark: '#08080d',
+              card: '#111119',
+              border: '#1f1f2e',
+              neonPurple: '#8b5cf6',
+              cyan: '#06b6d4',
+              emerald: '#10b981',
+              pink: '#ec4899',
+              gold: '#f59e0b',
+              danger: '#ef4444'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #08080d;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1f1f2e;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #8b5cf6;
+    }
+    .neon-purple {
+      box-shadow: 0 0 25px -4px rgba(139, 92, 246, 0.35);
+    }
+    .neon-cyan {
+      box-shadow: 0 0 25px -4px rgba(6, 182, 212, 0.35);
+    }
+    .card-glass {
+      background: linear-gradient(135deg, rgba(20, 20, 30, 0.85) 0%, rgba(10, 10, 16, 0.95) 100%);
+      backdrop-filter: blur(14px);
+    }
+    .tab-active {
+      background: linear-gradient(90deg, #8b5cf6, #06b6d4);
+      color: #ffffff !important;
+      font-weight: 700;
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.35);
+    }
+    .card-selected {
+      border-color: #8b5cf6 !important;
+      background: rgba(139, 92, 246, 0.12) !important;
+      box-shadow: 0 0 15px rgba(139, 92, 246, 0.25);
+    }
+    @keyframes alertGlow {
+      0%, 100% { border-color: rgba(239, 68, 68, 0.3); }
+      50% { border-color: rgba(239, 68, 68, 0.9); box-shadow: 0 0 20px rgba(239, 68, 68, 0.35); }
+    }
+    .alert-pulse {
+      animation: alertGlow 2.5s infinite;
+    }
+  </style>
+</head>
+
+<body class="bg-brand-dark text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-brand-neonPurple selection:text-white pb-14">
+
+  <!-- Main Top Bar -->
+  <header class="sticky top-0 z-40 bg-brand-dark/90 backdrop-blur-md border-b border-brand-border px-4 lg:px-8 py-3 transition-all">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-neonPurple via-brand-cyan to-brand-emerald flex items-center justify-center font-display text-xl font-black text-white shadow-lg">
+          D⚡
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-display font-black text-lg md:text-xl tracking-tight text-white">DROPSTORE</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-brand-neonPurple/20 text-brand-neonPurple border border-brand-neonPurple/40 uppercase tracking-widest font-bold">Turnaround v2.5</span>
+          </div>
+          <p class="text-xs text-slate-400 font-medium hidden sm:block">Laboratório de Finanças e Decisão Estratégica (15 a 18 anos)</p>
+        </div>
+      </div>
+
+      <!-- Tab Navigation -->
+      <nav class="flex items-center gap-1.5 overflow-x-auto py-1 px-1 bg-brand-card rounded-2xl border border-brand-border text-xs md:text-sm font-medium">
+        <button onclick="switchTab('overview')" id="tab-overview" class="tab-btn px-3.5 py-2 rounded-xl text-slate-300 hover:text-white transition-all flex items-center gap-2 whitespace-nowrap tab-active">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Diagnóstico & DRE</span>
+        </button>
+        <button onclick="switchTab('teams')" id="tab-teams" class="tab-btn px-3.5 py-2 rounded-xl text-slate-300 hover:text-white transition-all flex items-center gap-2 whitespace-nowrap">
+          <i class="fa-solid fa-users"></i>
+          <span>Comitês (<span id="team-badge-count">3</span>)</span>
+        </button>
+        <button onclick="switchTab('simulator')" id="tab-simulator" class="tab-btn px-3.5 py-2 rounded-xl text-slate-300 hover:text-white transition-all flex items-center gap-2 whitespace-nowrap">
+          <i class="fa-solid fa-sliders"></i>
+          <span>Tomada de Decisão</span>
+        </button>
+        <button onclick="switchTab('ranking')" id="tab-ranking" class="tab-btn px-3.5 py-2 rounded-xl text-slate-300 hover:text-white transition-all flex items-center gap-2 whitespace-nowrap">
+          <i class="fa-solid fa-trophy"></i>
+          <span>Leaderboard Geral</span>
+        </button>
+      </nav>
+
+      <!-- Utility Actions -->
+      <div class="flex items-center gap-2">
+        <button onclick="toggleProjectorMode()" class="px-3.5 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-brand-cyan border border-brand-cyan/40 text-xs font-bold tracking-wide flex items-center gap-2 transition" title="Modo Telão para Sala de Aula">
+          <i class="fa-solid fa-expand"></i>
+          <span class="hidden md:inline">Modo Telão</span>
+        </button>
+        <button onclick="resetAllDefaults()" class="p-2.5 rounded-xl bg-slate-800/60 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 border border-brand-border text-xs transition" title="Restaurar dados originais">
+          <i class="fa-solid fa-arrow-rotate-left"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 lg:px-8 mt-6 flex-1 w-full">
+
+    <!-- Classroom Problem Statement Banner -->
+    <div class="mb-6 p-4 rounded-2xl bg-gradient-to-r from-red-950/40 via-brand-card to-brand-card border alert-pulse flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex items-center gap-3.5">
+        <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0 text-lg border border-rose-500/30">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div>
+          <h2 class="text-sm font-bold text-rose-200">CASO EM ANDAMENTO: Alerta Vermelho na DropStore</h2>
+          <p class="text-xs text-slate-300">
+            A marca bateu recorde de faturamento com <strong class="text-white">R$ 60.000,00</strong>, mas fechou o trimestre com <strong class="text-rose-400 font-bold">-R$ 2.000,00</strong> de prejuízo na conta bancária. A missão da turma é identificar as torneiras abertas e restabelecer o lucro líquido!
+          </p>
+        </div>
+      </div>
+      <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30 shrink-0">
+        <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+        Margem Líquida Atual: -3,3%
+      </span>
+    </div>
+
+    <!-- TAB 1: VISÃO GERAL & DRE BASE -->
+    <section id="tab-content-overview" class="space-y-6">
+      
+      <!-- Storytelling & Streetwear Products -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Story Card with Streetwear Visuals -->
+        <div class="lg:col-span-8 card-glass rounded-3xl p-6 border border-brand-border relative overflow-hidden flex flex-col justify-between">
+          <div class="absolute -right-16 -top-16 w-56 h-56 bg-brand-neonPurple/20 rounded-full blur-3xl pointer-events-none"></div>
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-brand-cyan bg-brand-cyan/10 px-2.5 py-1 rounded-lg border border-brand-cyan/20">Briefing de Negócios</span>
+              <span class="text-xs text-slate-400">• Moda Streetwear Jovem</span>
+            </div>
+            <h2 class="font-display text-2xl lg:text-3xl font-extrabold text-white leading-tight">
+              Viral no Instagram, Caos na Tesouraria.
+            </h2>
+            <p class="text-slate-300 text-sm mt-3 leading-relaxed">
+              Dois estudantes de 18 anos lançaram a <strong class="text-white">DropStore</strong> com camisetas oversized e bonés snapback. Em menos de 90 dias, a marca bateu 60 mil reais em vendas. No entanto, sem dominar os <strong>indicadores financeiros básicos</strong>, eles ofereceram frete grátis sem valor mínimo e gastaram fortunas em anúncios no TikTok sem segmentação. O resultado: cada venda aumentava o rombo!
+            </p>
+          </div>
+
+          <!-- Streetwear Products Preview -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+            <div class="flex items-center gap-3 p-3 rounded-2xl bg-black/50 border border-brand-border">
+              <img src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=300&q=80" alt="Camiseta Oversized" class="w-16 h-16 rounded-xl object-cover shrink-0">
+              <div class="min-w-0">
+                <span class="text-xs font-bold text-white block truncate">Camiseta Heavyweight 260g</span>
+                <span class="text-xs text-emerald-400 font-semibold block">Venda: R$ 120 | Custo: R$ 40</span>
+                <span class="text-[10px] text-slate-400 block mt-0.5">Margem Bruta Unitária: 66,7% (Alta)</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 p-3 rounded-2xl bg-black/50 border border-brand-border">
+              <img src="https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=300&q=80" alt="Boné Streetwear" class="w-16 h-16 rounded-xl object-cover shrink-0">
+              <div class="min-w-0">
+                <span class="text-xs font-bold text-white block truncate">Boné Snapback Sarja Premium</span>
+                <span class="text-xs text-amber-400 font-semibold block">Venda: R$ 60 | Custo: R$ 35</span>
+                <span class="text-[10px] text-slate-400 block mt-0.5">Margem Bruta Unitária: 41,7% (Apertada)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 KPI Cards -->
+        <div class="lg:col-span-4 flex flex-col gap-3.5">
+          <div class="card-glass p-4 rounded-2xl border border-brand-border flex items-center justify-between">
+            <div>
+              <p class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">1. Margem Bruta</p>
+              <h3 class="text-2xl font-extrabold text-brand-cyan">60,0%</h3>
+              <p class="text-[11px] text-slate-400">R$ 36.000 após custos de tecido</p>
+            </div>
+            <div class="w-11 h-11 rounded-xl bg-brand-cyan/10 border border-brand-cyan/20 text-brand-cyan flex items-center justify-center text-lg">
+              <i class="fa-solid fa-scissors"></i>
+            </div>
+          </div>
+
+          <div class="card-glass p-4 rounded-2xl border border-brand-border flex items-center justify-between">
+            <div>
+              <p class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">2. Margem Líquida</p>
+              <h3 class="text-2xl font-extrabold text-rose-400">-3,3%</h3>
+              <p class="text-[11px] text-rose-400/90">A operação queima capital</p>
+            </div>
+            <div class="w-11 h-11 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-arrow-trend-down"></i>
+            </div>
+          </div>
+
+          <div class="card-glass p-4 rounded-2xl border border-brand-border flex items-center justify-between">
+            <div>
+              <p class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">3. Ponto de Equilíbrio</p>
+              <h3 class="text-2xl font-extrabold text-amber-400">R$ 63.333</h3>
+              <p class="text-[11px] text-slate-400">Vendas mínimas para zerar o jogo</p>
+            </div>
+            <div class="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-scale-balanced"></i>
+            </div>
+          </div>
+
+          <div class="card-glass p-4 rounded-2xl border border-brand-border flex items-center justify-between">
+            <div>
+              <p class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">4. Drenos de Lucro</p>
+              <h3 class="text-2xl font-extrabold text-purple-400">43,3%</h3>
+              <p class="text-[11px] text-slate-400">Frete + Anúncios somam R$ 26.000</p>
+            </div>
+            <div class="w-11 h-11 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-fire-burner"></i>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Detailed Baseline DRE and Visual Breakdown -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- DRE Table -->
+        <div class="lg:col-span-7 card-glass rounded-3xl p-6 border border-brand-border">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-display font-bold text-lg text-white flex items-center gap-2">
+                <i class="fa-solid fa-receipt text-brand-neonPurple"></i>
+                Demonstrativo do Resultado do Exercício (DRE Base)
+              </h3>
+              <p class="text-xs text-slate-400">Trimestre Atual antes da intervenção dos alunos</p>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 font-mono">Status: Auditado</span>
+          </div>
+
+          <div class="space-y-2 text-sm font-mono">
+            <div class="flex justify-between items-center py-2 px-3 rounded-xl bg-slate-800/50 text-slate-200">
+              <span class="font-sans font-semibold text-slate-300">(+) Receita Bruta de Vendas</span>
+              <div class="text-right">
+                <span class="font-bold text-white">R$ 60.000,00</span>
+                <span class="text-[11px] text-slate-400 ml-2">100,0%</span>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center py-2 px-3 rounded-xl bg-rose-950/20 text-rose-300 border border-rose-900/30">
+              <span class="font-sans">(-) Custos de Mercadorias Vendidas (CPV - Peças)</span>
+              <div class="text-right">
+                <span>-R$ 24.000,00</span>
+                <span class="text-[11px] text-slate-400 ml-2">40,0%</span>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center py-2.5 px-3 rounded-xl bg-brand-cyan/10 text-cyan-300 font-bold border border-brand-cyan/20">
+              <span class="font-sans">(=) LUCRO BRUTO</span>
+              <div class="text-right">
+                <span>R$ 36.000,00</span>
+                <span class="text-[11px] text-cyan-400/80 ml-2">60,0%</span>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center py-2 px-3 rounded-xl bg-slate-900/60 text-slate-300">
+              <span class="font-sans">(-) Despesas com Frete Grátis e Devoluções</span>
+              <div class="text-right">
+                <span class="text-rose-400">-R$ 11.000,00</span>
+                <span class="text-[11px] text-slate-400 ml-2">18,3%</span>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center py-2 px-3 rounded-xl bg-slate-900/60 text-slate-300">
+              <span class="font-sans">(-) Tráfego Pago & Anúncios Digitais</span>
+              <div class="text-right">
+                <span class="text-rose-400">-R$ 15.000,00</span>
+                <span class="text-[11px] text-slate-400 ml-2">25,0%</span>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center py-2 px-3 rounded-xl bg-slate-900/60 text-slate-300">
+              <span class="font-sans">(-) Despesas Fixas (Loja Box, Plataforma e Contabilidade)</span>
+              <div class="text-right">
+                <span class="text-rose-400">-R$ 12.000,00</span>
+                <span class="text-[11px] text-slate-400 ml-2">20,0%</span>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center py-3 px-3 rounded-xl bg-rose-600/20 text-rose-300 font-bold border border-rose-500/40 text-base">
+              <span class="font-sans flex items-center gap-2">
+                <i class="fa-solid fa-circle-exclamation text-rose-500"></i>
+                (=) RESULTADO LÍQUIDO OPERACIONAL
+              </span>
+              <div class="text-right">
+                <span class="text-rose-400 font-extrabold">-R$ 2.000,00</span>
+                <span class="text-xs text-rose-300/80 ml-2">-3,3%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart Container -->
+        <div class="lg:col-span-5 card-glass rounded-3xl p-6 border border-brand-border flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-display font-bold text-lg text-white">Destino de cada R$ 100 vendidos</h3>
+              <i class="fa-solid fa-chart-pie text-brand-cyan"></i>
+            </div>
+            <p class="text-xs text-slate-400 mb-4">Composição percentual dos custos e despesas</p>
+            <div class="h-60 relative flex items-center justify-center">
+              <canvas id="chart-initial-breakdown"></canvas>
+            </div>
+          </div>
+
+          <div class="mt-4 p-3.5 rounded-2xl bg-brand-border/40 border border-brand-border text-xs text-slate-300">
+            <span class="font-bold text-brand-neonPurple flex items-center gap-1.5 mb-1">
+              <i class="fa-solid fa-lightbulb"></i> Análise Pedagógica:
+            </span>
+            Observem que a produção (tecido e costura) tem custo saudável de 40%. O problema está na entrega sem critério e no custo excessivo para atrair visitantes para a loja virtual.
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- TAB 2: CADASTRO DE EQUIPES -->
+    <section id="tab-content-teams" class="hidden space-y-6">
+      <div class="card-glass rounded-3xl p-6 border border-brand-border">
+        
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-brand-border">
+          <div>
+            <h2 class="font-display text-2xl font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-users-gear text-brand-neonPurple"></i>
+              Comitês de Gestão da Turma
+            </h2>
+            <p class="text-sm text-slate-400">Cadastre ou edite as diretorias executivas da sala de aula.</p>
+          </div>
+          
+          <button onclick="openNewTeamModal()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-neonPurple to-brand-cyan hover:opacity-95 text-white font-bold text-xs md:text-sm shadow-lg shadow-purple-950/40 flex items-center gap-2 transition">
+            <i class="fa-solid fa-plus"></i>
+            <span>Nova Equipe</span>
+          </button>
+        </div>
+
+        <!-- Equipes Grid -->
+        <div id="teams-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
+          <!-- Rendered dynamically -->
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 3: SIMULADOR DE DECISÕES -->
+    <section id="tab-content-simulator" class="hidden space-y-6">
+      
+      <!-- Team Selector Bar -->
+      <div class="card-glass rounded-3xl p-5 border border-brand-border flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="flex items-center gap-3.5">
+          <div id="sim-team-icon" class="w-12 h-12 rounded-2xl bg-brand-neonPurple/20 border border-brand-neonPurple/40 flex items-center justify-center text-2xl text-brand-neonPurple font-bold">
+            ⚡
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs uppercase font-bold tracking-wider text-slate-400">Equipe em Sessão:</span>
+              <select id="team-selector-dropdown" onchange="switchActiveTeam(this.value)" class="bg-brand-dark text-white font-bold px-3 py-1 rounded-xl border border-brand-border focus:border-brand-neonPurple outline-none text-sm cursor-pointer">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+            <p id="sim-team-members" class="text-xs text-slate-400 mt-1">Integrantes: Carregando...</p>
+          </div>
+        </div>
+
+        <!-- Live Scoreboard Summary -->
+        <div class="flex items-center gap-4 bg-brand-dark/80 px-4 py-2.5 rounded-2xl border border-brand-border">
+          <div>
+            <span class="text-[10px] text-slate-400 uppercase font-bold block">Lucro Líquido Projetado</span>
+            <span id="quick-profit-display" class="text-lg font-mono font-extrabold text-emerald-400">+R$ 0,00</span>
+          </div>
+          <div class="h-8 w-px bg-brand-border"></div>
+          <div>
+            <span class="text-[10px] text-slate-400 uppercase font-bold block">Margem Líquida</span>
+            <span id="quick-margin-display" class="text-lg font-mono font-extrabold text-brand-cyan">0,0%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Decision Matrix & Live Statement -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Column: The 4 Decision Blocks -->
+        <div class="lg:col-span-8 space-y-6">
+
+          <!-- BLOCO 1: Logística e Frete -->
+          <div class="card-glass rounded-3xl p-6 border border-brand-border">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2.5">
+                <span class="w-7 h-7 rounded-lg bg-cyan-500/20 text-cyan-400 font-bold flex items-center justify-center text-xs border border-cyan-500/30">1</span>
+                <h3 class="font-display font-bold text-lg text-white">Logística & Política de Frete</h3>
+              </div>
+              <span class="text-xs font-mono text-slate-400">Despesa Atual: R$ 11.000</span>
+            </div>
+            <p class="text-xs text-slate-400 mb-4">Escolha como controlar o custo de entrega sem frustrar os clientes da loja:</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+              
+              <label class="decision-card relative flex flex-col justify-between p-4 rounded-2xl border-2 border-brand-border bg-slate-900/40 hover:border-slate-600 cursor-pointer transition">
+                <input type="radio" name="opt-shipping" value="A" onchange="handleDecisionChange('shipping', 'A')" class="absolute top-3 right-3 text-brand-neonPurple">
+                <div>
+                  <span class="text-xs font-bold text-rose-400 uppercase tracking-wide block mb-1">Opção A • Radical</span>
+                  <h4 class="font-bold text-sm text-white mb-2">Eliminar Frete Grátis</h4>
+                  <p class="text-[11px] text-slate-300 leading-relaxed">Cliente paga 100% da taxa de envio. Economiza R$ 9.000, mas gera abandono de 15% nas vendas de camisetas.</p>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-brand-border/60 text-[10px] text-slate-400 flex justify-between font-mono">
+                  <span class="text-emerald-400">Economia: R$ 9k</span>
+                  <span class="text-rose-400">Volume: -15%</span>
+                </div>
+              </label>
+
+              <label class="decision-card relative flex flex-col justify-between p-4 rounded-2xl border-2 border-brand-border bg-slate-900/40 hover:border-slate-600 cursor-pointer transition">
+                <input type="radio" name="opt-shipping" value="B" onchange="handleDecisionChange('shipping', 'B')" class="absolute top-3 right-3 text-brand-neonPurple">
+                <div>
+                  <span class="text-xs font-bold text-emerald-400 uppercase tracking-wide block mb-1">Opção B • Estratégica</span>
+                  <h4 class="font-bold text-sm text-white mb-2">Frete Grátis acima de R$ 200</h4>
+                  <p class="text-[11px] text-slate-300 leading-relaxed">Condiciona o benefício à compra de pelo menos duas peças. Poupa R$ 5.500 no frete e sobe o ticket médio em 10%.</p>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-brand-border/60 text-[10px] text-slate-400 flex justify-between font-mono">
+                  <span class="text-emerald-400">Economia: R$ 5,5k</span>
+                  <span class="text-emerald-400">Ticket: +10%</span>
+                </div>
+              </label>
+
+              <label class="decision-card relative flex flex-col justify-between p-4 rounded-2xl border-2 border-brand-border bg-slate-900/40 hover:border-slate-600 cursor-pointer transition">
+                <input type="radio" name="opt-shipping" value="C" onchange="handleDecisionChange('shipping', 'C')" class="absolute top-3 right-3 text-brand-neonPurple">
+                <div>
+                  <span class="text-xs font-bold text-amber-400 uppercase tracking-wide block mb-1">Opção C • Econômica</span>
+                  <h4 class="font-bold text-sm text-white mb-2">Transportadora Econômica</h4>
+                  <p class="text-[11px] text-slate-300 leading-relaxed">Prazo de 18 dias úteis. Poupa R$ 2.000, mas o atraso eleva cancelamentos e devoluções em 5%.</p>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-brand-border/60 text-[10px] text-slate-400 flex justify-between font-mono">
+                  <span class="text-emerald-400">Economia: R$ 2k</span>
+                  <span class="text-amber-400">Devoluções: +5%</span>
+                </div>
+              </label>
+
+            </div>
+          </div>
+
+          <!-- BLOCO 2: Tráfego Pago & Marketing -->
+          <div class="card-glass rounded-3xl p-6 border border-brand-border">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2.5">
+                <span class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-400 font-bold flex items-center justify-center text-xs border border-purple-500/30">2</span>
+                <h3 class="font-display font-bold text-lg text-white">Marketing & Aquisição de Clientes</h3>
+              </div>
+              <span class="text-xs font-mono text-slate-400">Despesa Atual: R$ 15.000</span>
+            </div>
+            <p class="text-xs text-slate-400 mb-4">Como a marca irá direcionar a verba de publicidade digital:</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+              
+              <label class="decision-card relative flex flex-col justify-between p-4 rounded-2xl border-2 border-brand-border bg-slate-900/40 hover:border-slate-600 cursor-pointer transition">
+                <input type="radio" name="opt-marketing" value="A" onchange="handleDecisionChange('marketing', 'A')" class="absolute top-3 right-3 text-brand-neonPurple">
+                <div>
+                  <span class="text-xs font-bold text-brand-cyan uppercase tracking-wide block mb-1">Opção A • Hiperfoco</span>
+                  <h4 class="font-bold text-sm text-white mb-2">Anúncios Só nas Camisetas</h4>
+                  <p class="text-[11px] text-slate-300 leading-relaxed">Pausa campanhas do boné e foca R$ 8.000 apenas no item com maior margem (camisetas). Poupa R$ 7.000 em Ads.</p>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-brand-border/60 text-[10px] text-slate-400 flex justify-between font-mono">
+                  <span>Ads: R$ 8.000</span>
+                  <span class="text-emerald-400">Economia: R$ 7k</span>
+                </div>
+              </label>
+
+              <label class="decision-card relative flex flex-col justify-between p-4 rounded-2xl border-2 border-brand-border bg-slate-900/40 hover:border-slate-600 cursor-pointer transition">
+                <input type="radio" name="opt-marketing" value="B" onchange="handleDecisionChange('marketing', 'B')" class="absolute top-3 right-3 text-brand-neonPurple">
+                <div>
+                  <span class="text-xs font-bold text-pink-400 uppercase tracking-wide block mb-1">Opção B • Creators</span>
+                  <h4 class="font-bold text-sm text-white mb-2">Criadores do TikTok</h4>
+                  <p class="text-[11px] text-slate-300 leading-relaxed">Contrata 3 criadores streetwear por R$ 4.000 e mantém R$ 5.000 em Ads (total R$ 9.000). Atrai 50 novos pedidos de camisetas.</p>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-brand-border/60 text-[10px] text-slate-400 flex justify-between font-mono">
+                  <span>Total: R$ 9.000</span>
+                  <span class="text-emerald-400">+50 Pedidos</span>
+                </div>
+              </label>
+
+              <label class="decision-card relative flex flex-col justify-between p-4 rounded-2xl border-2 border-brand-border bg-slate-900/40 hover:border-slate-600 cursor-pointer transition">
+                <input type="radio" name="opt-marketing" value="C" onchange="handleDecisionChange('marketing', 'C')" class="absolute top-3 right-3 text-brand-neonPurple">
+                <div>
+                  <span class="text-xs font-bold text-rose-400 uppercase tracking-wide block mb-1">Opção C • Corte Cego</span>
+                  <h4 class="font-bold text-sm text-white mb-2">Cortar Orçamento em 50%</h4>
+                  <p class="text-[11px] text-slate-300 leading-relaxed">Corta para R$ 7.500 sem análise de criativos. Economiza dinheiro imediato, mas as visitas e vendas totais desabam 25%.</p>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-brand-border/60 text-[10px] text-slate-400 flex justify-between font-mono">
+                  <span>Ads: R$ 7.500</span>
+                  <span class="text-rose-400">Vendas: -25%</span>
+                </div>
+              </label>
+
+            </div>
+          </div>
+
+          <!-- BLOCO 3: Gestão de Produtos & Preço -->
+          <div class="card-glass rounded-3xl p-6 border border-brand-border">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2.5">
+                <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center text-xs border border-emerald-500/30">3</span>
+                <h3 class="font-display font-bold text-lg text-white">Catálogo & Precificação</h3>
+              </div>
+              <span class="text-xs font-mono text-slate-400">Mix: Oversized vs Bonés</span>
+            </div>
+            <p class="text-xs text-slate-400 mb-4">O que fazer com o boné snapback (o produto de margem mais apertada):</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+              
+              <label class="decision-card relative flex flex-col justify-between p-4 rounded-2xl border-2 border-brand-border bg-slate-900/40 hover:border-slate-600 cursor-pointer transition">
+                <input type="radio" name="opt-product" value="A" onchange="handleDecisionChange('product', 'A')" class="absolute top-3 right-3 text-brand-neonPurple">
+                <div>
+                  <span class="text-xs font-bold text-rose-400 uppercase tracking-wide block mb-1">Opção A • Descontinuar</span>
+                  <h4 class="font-bold text-sm text-white mb-2">Tirar o Boné do Catálogo</h4>
+                  <p class="text-[11px] text-slate-300 leading-relaxed">Queima o estoque remanescente gerando R$ 3.000 no caixa. Concentra todo o esforço apenas nas camisetas.</p>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-brand-border/60 text-[10px] text-slate-400 flex justify-between font-mono">
+                  <span class="text-emerald-400">Caixa: +R$ 3.000</span>
+                  <span>Foco total</span>
+                </div>
+              </label>
+
+              <label class="decision-card relative flex flex-col justify-between p-4 rounded-2xl border-2 border-brand-border bg-slate-900/40 hover:border-slate-600 cursor-pointer transition">
+                <input type="radio" name="opt-product" value="B" onchange="handleDecisionChange('product', 'B')" class="absolute top-3 right-3 text-brand-neonPurple">
+                <div>
+                  <span class="text-xs font-bold text-brand-cyan uppercase tracking-wide block mb-1">Opção B • Combo</span>
+                  <h4 class="font-bold text-sm text-white mb-2">Kit Camiseta + Boné por R$ 150</h4>
+                  <p class="text-[11px] text-slate-300 leading-relaxed">Desconto de R$ 30 no combo. Acelera o giro do boné, eleva volume em 40% e adiciona R$ 4.500 de lucro bruto.</p>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-brand-border/60 text-[10px] text-slate-400 flex justify-between font-mono">
+                  <span class="text-emerald-400">Margem: +R$ 4,5k</span>
+                  <span>Giro rápido</span>
+                </div>
+              </label>
+
+              <label class="decision-card relative flex flex-col justify-between p-4 rounded-2xl border-2 border-brand-border bg-slate-900/40 hover:border-slate-600 cursor-pointer transition">
+                <input type="radio" name="opt-product" value="C" onchange="handleDecisionChange('product', 'C')" class="absolute top-3 right-3 text-brand-neonPurple">
+                <div>
+                  <span class="text-xs font-bold text-amber-400 uppercase tracking-wide block mb-1">Opção C • Reposicionar</span>
+                  <h4 class="font-bold text-sm text-white mb-2">Subir Preço do Boné para R$ 75</h4>
+                  <p class="text-[11px] text-slate-300 leading-relaxed">Aumenta preço unitário. Volume cai 50% (para 100 peças), porém cada unidade vendida gera margem mais saudável.</p>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-brand-border/60 text-[10px] text-slate-400 flex justify-between font-mono">
+                  <span>Margem unitária alta</span>
+                  <span class="text-amber-400">Volume: -50%</span>
+                </div>
+              </label>
+
+            </div>
+          </div>
+
+          <!-- BLOCO 4: Carta do Destino (Mercado Aleatório) -->
+          <div class="card-glass rounded-3xl p-6 border border-brand-border relative overflow-hidden">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2.5">
+                <span class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center text-xs border border-amber-500/30">4</span>
+                <h3 class="font-display font-bold text-lg text-white">Carta do Destino (Evento Aleatório)</h3>
+              </div>
+              <button onclick="rollDestinyCard()" class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold flex items-center gap-2 transition">
+                <i class="fa-solid fa-dice"></i>
+                <span>Sortear Evento</span>
+              </button>
+            </div>
+            
+            <p class="text-xs text-slate-400 mb-4">No mercado real, imprevistos acontecem. O evento de mercado afeta o time conforme as escolhas tomadas:</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+              
+              <label class="decision-card relative flex flex-col justify-between p-4 rounded-2xl border-2 border-brand-border bg-slate-900/40 hover:border-slate-600 cursor-pointer transition">
+                <input type="radio" name="opt-destiny" value="1" onchange="handleDecisionChange('destiny', '1')" class="absolute top-3 right-3 text-brand-neonPurple">
+                <div>
+                  <span class="text-xs font-bold text-purple-400 uppercase tracking-wide block mb-1">Carta 1 • Viral nas Redes</span>
+                  <h4 class="font-bold text-sm text-white mb-2">Trend Imprevista</h4>
+                  <p class="text-[11px] text-slate-300 leading-relaxed">Quem investiu na Opção B de Marketing (Criadores) ganha +R$ 4.000 em vendas puras. Outros times somam apenas +R$ 500.</p>
+                </div>
+              </label>
+
+              <label class="decision-card relative flex flex-col justify-between p-4 rounded-2xl border-2 border-brand-border bg-slate-900/40 hover:border-slate-600 cursor-pointer transition">
+                <input type="radio" name="opt-destiny" value="2" onchange="handleDecisionChange('destiny', '2')" class="absolute top-3 right-3 text-brand-neonPurple">
+                <div>
+                  <span class="text-xs font-bold text-rose-400 uppercase tracking-wide block mb-1">Carta 2 • Crise Logística</span>
+                  <h4 class="font-bold text-sm text-white mb-2">Gargalo nos Correios</h4>
+                  <p class="text-[11px] text-slate-300 leading-relaxed">Quem adotou frete econômico lento perde R$ 3.000 em estornos e processos. Outros grupos perdem apenas R$ 500.</p>
+                </div>
+              </label>
+
+              <label class="decision-card relative flex flex-col justify-between p-4 rounded-2xl border-2 border-brand-border bg-slate-900/40 hover:border-slate-600 cursor-pointer transition">
+                <input type="radio" name="opt-destiny" value="3" onchange="handleDecisionChange('destiny', '3')" class="absolute top-3 right-3 text-brand-neonPurple">
+                <div>
+                  <span class="text-xs font-bold text-amber-400 uppercase tracking-wide block mb-1">Carta 3 • Inflação Têxtil</span>
+                  <h4 class="font-bold text-sm text-white mb-2">Alta do Fio de Algodão</h4>
+                  <p class="text-[11px] text-slate-300 leading-relaxed">O custo da malha sobe 8% no atacado para toda a indústria da moda. Equipes com boa margem absorvem sem entrar no vermelho.</p>
+                </div>
+              </label>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Live Recalculated DRE -->
+        <div class="lg:col-span-4 space-y-6">
+          <div class="card-glass rounded-3xl p-6 border border-brand-border sticky top-24">
+            
+            <div class="flex items-center justify-between pb-3 border-b border-brand-border">
+              <div>
+                <h3 class="font-display font-bold text-base text-white">DRE Gerencial Projetada</h3>
+                <p class="text-xs text-slate-400">Recalculado instantaneamente</p>
+              </div>
+              <span id="calc-status-badge" class="text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                LUCRO
+              </span>
+            </div>
+
+            <div class="mt-4 space-y-2.5 text-xs font-mono">
+              <div class="flex justify-between items-center text-slate-300">
+                <span>Receita Bruta:</span>
+                <span id="calc-revenue" class="font-bold text-white">R$ 60.000</span>
+              </div>
+              <div class="flex justify-between items-center text-rose-300">
+                <span>(-) Custo dos Produtos (CPV):</span>
+                <span id="calc-cogs">-R$ 24.000</span>
+              </div>
+              <div class="flex justify-between items-center text-brand-cyan font-bold py-1 border-y border-brand-border/60">
+                <span>(=) Lucro Bruto:</span>
+                <span id="calc-gross-profit">R$ 36.000</span>
+              </div>
+              <div class="flex justify-between items-center text-slate-300">
+                <span>(-) Despesas Frete:</span>
+                <span id="calc-shipping" class="text-rose-400">-R$ 5.500</span>
+              </div>
+              <div class="flex justify-between items-center text-slate-300">
+                <span>(-) Despesas Marketing:</span>
+                <span id="calc-marketing" class="text-rose-400">-R$ 9.000</span>
+              </div>
+              <div class="flex justify-between items-center text-slate-300">
+                <span>(-) Custos Fixos:</span>
+                <span id="calc-fixed" class="text-rose-400">-R$ 12.000</span>
+              </div>
+              <div class="flex justify-between items-center text-purple-300">
+                <span>(+/-) Evento Mercado:</span>
+                <span id="calc-destiny" class="font-bold">+R$ 4.000</span>
+              </div>
+
+              <!-- Highlight Result Box -->
+              <div class="p-3.5 rounded-2xl bg-black/60 border border-brand-border mt-3 space-y-1.5">
+                <div class="flex justify-between items-center">
+                  <span class="text-slate-300 font-sans font-bold">Novo Lucro Líquido:</span>
+                  <span id="calc-net-profit" class="text-base font-extrabold text-emerald-400">R$ +9.500</span>
+                </div>
+                <div class="flex justify-between items-center text-[11px]">
+                  <span class="text-slate-400">Nova Margem Líquida:</span>
+                  <span id="calc-net-margin" class="font-bold text-brand-cyan">14,6%</span>
+                </div>
+                <div class="flex justify-between items-center text-[11px]">
+                  <span class="text-slate-400">Ponto de Equilíbrio:</span>
+                  <span id="calc-breakeven" class="font-bold text-slate-200">R$ 44.166</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Consultant Diagnostic Note -->
+            <div class="mt-4 p-3.5 rounded-2xl bg-brand-neonPurple/10 border border-brand-neonPurple/20 text-xs">
+              <span class="font-bold text-brand-neonPurple flex items-center gap-1.5 mb-1">
+                <i class="fa-solid fa-graduation-cap"></i> Parecer do Consultor:
+              </span>
+              <p id="calc-feedback-note" class="text-slate-300 leading-relaxed">
+                Excelente estratégia! A equipe conteve despesas logísticas sem matar o volume de vendas e usou a força dos criadores de conteúdo para focar nas camisetas de alta margem.
+              </p>
+            </div>
+
+            <button onclick="saveCurrentDecisions(this)" class="w-full mt-4 py-3 rounded-2xl bg-gradient-to-r from-brand-emerald to-teal-500 hover:opacity-95 text-white font-bold text-sm shadow-lg shadow-emerald-950/40 flex items-center justify-center gap-2 transition">
+              <i class="fa-solid fa-check"></i>
+              <span>Confirmar Decisões da Equipe</span>
+            </button>
+
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- TAB 4: LEADERBOARD GERAL -->
+    <section id="tab-content-ranking" class="hidden space-y-6">
+      
+      <!-- Top 3 Podium Cards -->
+      <div id="podium-cards-grid" class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Ranking Table and Evolution Chart -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Table -->
+        <div class="lg:col-span-7 card-glass rounded-3xl p-6 border border-brand-border">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-display font-bold text-lg text-white flex items-center gap-2">
+                <i class="fa-solid fa-ranking-star text-brand-gold"></i>
+                Classificação Geral das Equipes
+              </h3>
+              <p class="text-xs text-slate-400">Classificado por maior Lucro Líquido gerado</p>
+            </div>
+            <button onclick="triggerConfetti()" class="px-3.5 py-1.5 rounded-xl bg-purple-600/20 text-purple-300 border border-purple-500/30 text-xs font-bold hover:bg-purple-600/30 flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <span>Comemorar</span>
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs font-mono">
+              <thead class="text-slate-400 border-b border-brand-border">
+                <tr>
+                  <th class="py-2.5 px-3">#</th>
+                  <th class="py-2.5 px-3">Equipe</th>
+                  <th class="py-2.5 px-3">Estratégia</th>
+                  <th class="py-2.5 px-3">Lucro Líquido</th>
+                  <th class="py-2.5 px-3">Margem %</th>
+                  <th class="py-2.5 px-3">Status</th>
+                </tr>
+              </thead>
+              <tbody id="ranking-table-rows" class="divide-y divide-brand-border/60">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Comparative Chart -->
+        <div class="lg:col-span-5 card-glass rounded-3xl p-6 border border-brand-border flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-display font-bold text-lg text-white">Comparativo de Lucro</h3>
+              <i class="fa-solid fa-chart-simple text-brand-neonPurple"></i>
+            </div>
+            <p class="text-xs text-slate-400 mb-4">Performance financeira por equipe</p>
+            <div class="h-64 relative">
+              <canvas id="chart-ranking-comparison"></canvas>
+            </div>
+          </div>
+
+          <div class="mt-4 p-3 rounded-2xl bg-black/50 border border-brand-border text-xs text-slate-400">
+            <strong class="text-white">Dica Pedagógica:</strong> Uma empresa saudável não é aquela que apenas gasta zero, mas aquela que consegue gerar lucro percentual equilibrado sobre sua receita total.
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- MODAL: MODO TELÃO / DATASHOW -->
+  <div id="projector-fullscreen-modal" class="fixed inset-0 z-50 bg-[#07070b] hidden flex-col p-6 md:p-10 overflow-y-auto">
+    <div class="max-w-7xl mx-auto w-full flex-1 flex flex-col justify-between">
+      
+      <!-- Projector Header -->
+      <div class="flex items-center justify-between pb-6 border-b border-brand-border">
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-neonPurple via-brand-cyan to-brand-emerald flex items-center justify-center font-display text-2xl font-black text-white shadow-2xl">
+            D⚡
+          </div>
+          <div>
+            <span class="text-xs uppercase font-extrabold tracking-widest text-brand-cyan">Painel de Projeção em Sala • DataShow</span>
+            <h2 class="font-display text-2xl md:text-3xl font-black text-white">DROPSTORE: RESULTADOS DA RODADA</h2>
+          </div>
+        </div>
+        <button onclick="toggleProjectorMode()" class="px-5 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm border border-brand-border flex items-center gap-2">
+          <i class="fa-solid fa-xmark"></i>
+          <span>Fechar Telão</span>
+        </button>
+      </div>
+
+      <!-- Large Podium Presentation -->
+      <div id="projector-cards-container" class="grid grid-cols-1 md:grid-cols-3 gap-6 my-8">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Bottom Benchmark Figures -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6 border-t border-brand-border font-mono">
+        <div class="p-4 rounded-2xl bg-brand-card border border-brand-border">
+          <span class="text-xs text-slate-400 font-sans font-bold uppercase">Prejuízo Inicial da Marca</span>
+          <p class="text-2xl font-black text-rose-500">-R$ 2.000,00</p>
+        </div>
+        <div class="p-4 rounded-2xl bg-brand-card border border-brand-border">
+          <span class="text-xs text-slate-400 font-sans font-bold uppercase">Maior Lucro Atingido</span>
+          <p id="proj-metric-profit" class="text-2xl font-black text-emerald-400">+R$ 0,00</p>
+        </div>
+        <div class="p-4 rounded-2xl bg-brand-card border border-brand-border">
+          <span class="text-xs text-slate-400 font-sans font-bold uppercase">Melhor Margem Líquida</span>
+          <p id="proj-metric-margin" class="text-2xl font-black text-brand-cyan">0,0%</p>
+        </div>
+        <div class="p-4 rounded-2xl bg-brand-card border border-brand-border">
+          <span class="text-xs text-slate-400 font-sans font-bold uppercase">Comitês Participantes</span>
+          <p id="proj-metric-teams" class="text-2xl font-black text-purple-400">3 Equipes</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: CADASTRAR EQUIPE -->
+  <div id="new-team-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="card-glass max-w-md w-full rounded-3xl p-6 border border-brand-border space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-brand-border">
+        <h3 class="font-display font-bold text-lg text-white">Cadastrar Comitê de Gestão</h3>
+        <button onclick="closeNewTeamModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="space-y-3 text-sm">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Nome da Equipe</label>
+          <input type="text" id="input-team-name" placeholder="Ex: Hype Capital, Vortex Street..." class="w-full bg-brand-dark px-3.5 py-2.5 rounded-xl border border-brand-border text-white focus:border-brand-neonPurple outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Integrantes do Grupo</label>
+          <input type="text" id="input-team-members" placeholder="Ex: Felipe, Bia, Enzo e Rafa" class="w-full bg-brand-dark px-3.5 py-2.5 rounded-xl border border-brand-border text-white focus:border-brand-neonPurple outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Mascote da Equipe</label>
+          <select id="input-team-icon" class="bg-brand-dark px-3.5 py-2.5 rounded-xl border border-brand-border text-white outline-none w-full">
+            <option value="⚡">⚡ Raio Neon</option>
+            <option value="🔥">🔥 Hype Fire</option>
+            <option value="💎">💎 Diamante</option>
+            <option value="🛹">🛹 Skate Urban</option>
+            <option value="👑">👑 Street King</option>
+            <option value="🚀">🚀 Rocket</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex gap-2 pt-2">
+        <button onclick="closeNewTeamModal()" class="flex-1 py-2.5 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs hover:bg-slate-700 transition">Cancelar</button>
+        <button onclick="saveNewTeam()" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-brand-neonPurple to-brand-cyan text-white font-bold text-xs hover:opacity-90 transition">Cadastrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Initial Seed Teams
+    const SEED_TEAMS = [
+      {
+        id: 'team-1',
+        name: 'Alpha Hype Capital',
+        members: 'Matheus, Sofia, Caio e Laura',
+        icon: '⚡',
+        decisions: { shipping: 'B', marketing: 'B', product: 'B', destiny: '1' }
+      },
+      {
+        id: 'team-2',
+        name: 'Vortex Street Gestão',
+        members: 'Gabriel, Felipe, Yasmin e Igor',
+        icon: '🔥',
+        decisions: { shipping: 'A', marketing: 'A', product: 'B', destiny: '1' }
+      },
+      {
+        id: 'team-3',
+        name: 'Oversized Finance Lab',
+        members: 'Beatriz, Lucas, Thiago e Giovanna',
+        icon: '💎',
+        decisions: { shipping: 'C', marketing: 'C', product: 'A', destiny: '1' }
+      }
+    ];
+
+    // LocalStorage or Defaults
+    let teamsData = [];
+    try {
+      const stored = localStorage.getItem('dropstore_game_teams');
+      teamsData = stored ? JSON.parse(stored) : SEED_TEAMS;
+    } catch (e) {
+      teamsData = SEED_TEAMS;
+    }
+
+    let currentSelectedTeamId = teamsData[0]?.id || 'team-1';
+
+    // Chart instances
+    let chartInitial = null;
+    let chartRanking = null;
+
+    // Baseline Financial Numbers
+    const BASE_METRICS = {
+      revenue: 60000,
+      cogs: 24000,
+      shipping: 11000,
+      marketing: 15000,
+      fixed: 12000
+    };
+
+    // Financial Engine
+    function calculateTeamFinancials(decisions) {
+      let revenue = BASE_METRICS.revenue;
+      let cogs = BASE_METRICS.cogs;
+      let shipping = BASE_METRICS.shipping;
+      let marketing = BASE_METRICS.marketing;
+      let fixed = BASE_METRICS.fixed;
+      let destinyModifier = 0;
+      let feedback = [];
+
+      // 1. Shipping Strategy
+      if (decisions.shipping === 'A') {
+        shipping = 2000; // Slashes R$ 9.000
+        revenue *= 0.85; // 15% abandonment
+        cogs *= 0.85;
+        feedback.push("Eliminar frete grátis reduziu despesas, mas gerou 15% de abandono de carrinho.");
+      } else if (decisions.shipping === 'B') {
+        shipping = 5500; // Saves R$ 5.500
+        revenue *= 1.10; // +10% average order value
+        cogs *= 1.05;
+        feedback.push("Frete grátis inteligente acima de R$ 200 elevou o ticket médio das compras.");
+      } else if (decisions.shipping === 'C') {
+        shipping = 9000; // Saves R$ 2.000
+        revenue *= 0.95; // 5% chargebacks
+        feedback.push("Transportadora lenta resultou em reclamações e devoluções dos clientes.");
+      }
+
+      // 2. Marketing Strategy
+      if (decisions.marketing === 'A') {
+        marketing = 8000; // Saves R$ 7.000
+        revenue *= 0.92;
+        cogs *= 0.93;
+        feedback.push("Foco 100% no produto campeão (camisetas) economizou R$ 7.000 em publicidade.");
+      } else if (decisions.marketing === 'B') {
+        marketing = 9000; // Saves R$ 6.000
+        revenue += 6000; // 50 extra orders * 120
+        cogs += 2000; // 50 * 40
+        feedback.push("Criadores do TikTok atraíram 50 novos pedidos de camisetas de alta margem!");
+      } else if (decisions.marketing === 'C') {
+        marketing = 7500; // 50% slash
+        revenue *= 0.75; // -25% revenue
+        cogs *= 0.80;
+        feedback.push("Corte cego de marketing derrubou as visitas e as vendas em 25%.");
+      }
+
+      // 3. Product Catalog Strategy
+      if (decisions.product === 'A') {
+        destinyModifier += 3000; // inventory clearance cash
+        revenue -= 6000;
+        cogs -= 3500;
+        feedback.push("Descontinuar o boné gerou R$ 3.000 de caixa imediato na queima de estoque.");
+      } else if (decisions.product === 'B') {
+        revenue += 7000;
+        cogs += 2500;
+        feedback.push("Combo 'Camiseta + Boné' alavancou o volume de vendas mantendo lucro bruto forte.");
+      } else if (decisions.product === 'C') {
+        revenue += 1500;
+        cogs -= 1000;
+        feedback.push("Aumento no preço do boné protegeu a margem unitária apesar da queda no volume.");
+      }
+
+      // 4. Destiny Card Effect
+      if (decisions.destiny === '1') {
+        if (decisions.marketing === 'B') {
+          destinyModifier += 4000;
+          feedback.push("BÔNUS VIRAL: A trend do TikTok explodiu a campanha dos criadores (+R$ 4.000).");
+        } else {
+          destinyModifier += 500;
+          feedback.push("A trend nas redes gerou um leve aumento nas vendas espontâneas (+R$ 500).");
+        }
+      } else if (decisions.destiny === '2') {
+        if (decisions.shipping === 'C') {
+          destinyModifier -= 3000;
+          feedback.push("PREJUÍZO LOGÍSTICO: Greve dos Correios puniu fortemente o frete econômico (-R$ 3.000).");
+        } else {
+          destinyModifier -= 500;
+          feedback.push("Atrasos gerais no tráfego rodoviário custaram -R$ 500 em estornos.");
+        }
+      } else if (decisions.destiny === '3') {
+        cogs *= 1.08;
+        feedback.push("ALERTA DE MERCADO: Alta do algodão subiu o custo dos tecidos em 8%.");
+      }
+
+      const grossProfit = revenue - cogs;
+      const netProfit = grossProfit - shipping - marketing - fixed + destinyModifier;
+      const netMargin = (netProfit / revenue) * 100;
+      const contributionRatio = grossProfit / revenue;
+      const breakeven = contributionRatio > 0 ? (fixed + shipping + marketing) / contributionRatio : 0;
+
+      return {
+        revenue: Math.round(revenue),
+        cogs: Math.round(cogs),
+        grossProfit: Math.round(grossProfit),
+        shipping: Math.round(shipping),
+        marketing: Math.round(marketing),
+        fixed: Math.round(fixed),
+        destinyImpact: Math.round(destinyModifier),
+        netProfit: Math.round(netProfit),
+        netMargin: Number(netMargin.toFixed(1)),
+        breakeven: Math.round(breakeven),
+        feedback: feedback.join(" ")
+      };
+    }
+
+    // Chart 1: Initial Breakdown Donut
+    function initInitialChart() {
+      const canvas = document.getElementById('chart-initial-breakdown');
+      if (!canvas) return;
+
+      if (chartInitial) chartInitial.destroy();
+
+      chartInitial = new Chart(canvas, {
+        type: 'doughnut',
+        data: {
+          labels: ['Tecido & Costura (CPV)', 'Tráfego & Anúncios', 'Frete Grátis', 'Custos Fixos'],
+          datasets: [{
+            data: [24000, 15000, 11000, 12000],
+            backgroundColor: ['#06b6d4', '#8b5cf6', '#ec4899', '#64748b'],
+            borderWidth: 0,
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: '#cbd5e1',
+                boxWidth: 12,
+                font: { size: 10, family: 'Plus Jakarta Sans' }
+              }
+            }
+          },
+          cutout: '72%'
+        }
+      });
+    }
+
+    // Chart 2: Leaderboard Comparison Bar
+    function updateRankingChart(sortedTeams) {
+      const canvas = document.getElementById('chart-ranking-comparison');
+      if (!canvas) return;
+
+      const labels = sortedTeams.map(t => t.name);
+      const data = sortedTeams.map(t => t.financials.netProfit);
+      const bgColors = data.map(v => v >= 0 ? 'rgba(16, 185, 129, 0.85)' : 'rgba(239, 68, 68, 0.85)');
+
+      if (chartRanking) chartRanking.destroy();
+
+      chartRanking = new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Lucro Líquido (R$)',
+            data: data,
+            backgroundColor: bgColors,
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              grid: { color: '#1f1f2e' },
+              ticks: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', size: 10 } }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#cbd5e1', font: { family: 'Plus Jakarta Sans', size: 10 } }
+            }
+          }
+        }
+      });
+    }
+
+    // Navigation Switcher
+    function switchTab(targetTab) {
+      const tabs = ['overview', 'teams', 'simulator', 'ranking'];
+      tabs.forEach(tab => {
+        const content = document.getElementById(`tab-content-${tab}`);
+        const btn = document.getElementById(`tab-${tab}`);
+        if (content && btn) {
+          if (tab === targetTab) {
+            content.classList.remove('hidden');
+            btn.classList.add('tab-active');
+          } else {
+            content.classList.add('hidden');
+            btn.classList.remove('tab-active');
+          }
+        }
+      });
+
+      if (targetTab === 'ranking') {
+        renderLeaderboardSection();
+      } else if (targetTab === 'teams') {
+        renderTeamsSection();
+      } else if (targetTab === 'simulator') {
+        syncSimulatorWithActiveTeam();
+      }
+    }
+
+    // Render Teams Grid
+    function renderTeamsSection() {
+      const container = document.getElementById('teams-grid-container');
+      const badge = document.getElementById('team-badge-count');
+      if (!container) return;
+
+      badge.textContent = teamsData.length;
+      container.innerHTML = '';
+
+      teamsData.forEach(team => {
+        const fin = calculateTeamFinancials(team.decisions);
+        const isProfitable = fin.netProfit >= 0;
+
+        const card = document.createElement('div');
+        card.className = 'p-5 rounded-2xl bg-brand-card border border-brand-border hover:border-brand-neonPurple/50 transition flex flex-col justify-between space-y-4';
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="text-2xl p-2 rounded-xl bg-brand-dark border border-brand-border">${team.icon}</span>
+                <div>
+                  <h4 class="font-bold text-white text-base">${team.name}</h4>
+                  <span class="text-xs text-slate-400 block">${team.members}</span>
+                </div>
+              </div>
+              <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${isProfitable ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'}">
+                ${isProfitable ? 'LUCRO' : 'PREJUÍZO'}
+              </span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 mt-4 text-xs font-mono">
+              <div class="p-2.5 rounded-xl bg-black/50">
+                <span class="text-[10px] text-slate-400 block">Lucro Projetado</span>
+                <span class="font-extrabold ${isProfitable ? 'text-emerald-400' : 'text-rose-400'}">R$ ${fin.netProfit.toLocaleString('pt-BR')}</span>
+              </div>
+              <div class="p-2.5 rounded-xl bg-black/50">
+                <span class="text-[10px] text-slate-400 block">Margem Líquida</span>
+                <span class="font-extrabold text-brand-cyan">${fin.netMargin}%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex gap-2 pt-2 border-t border-brand-border/60">
+            <button onclick="pickTeamToSimulate('${team.id}')" class="flex-1 py-2 rounded-xl bg-brand-neonPurple/20 hover:bg-brand-neonPurple/30 text-brand-neonPurple border border-brand-neonPurple/30 text-xs font-bold transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-sliders"></i> Decidir
+            </button>
+            <button onclick="removeTeam('${team.id}')" class="p-2 rounded-xl bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition" title="Excluir equipe">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Modal Team Creation
+    function openNewTeamModal() {
+      const modal = document.getElementById('new-team-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeNewTeamModal() {
+      const modal = document.getElementById('new-team-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function saveNewTeam() {
+      const name = document.getElementById('input-team-name').value.trim();
+      const members = document.getElementById('input-team-members').value.trim();
+      const icon = document.getElementById('input-team-icon').value;
+
+      if (!name) return;
+
+      const newObj = {
+        id: 'team-' + Date.now(),
+        name: name,
+        members: members || 'Alunos do Comitê',
+        icon: icon || '⚡',
+        decisions: { shipping: 'B', marketing: 'B', product: 'B', destiny: '1' }
+      };
+
+      teamsData.push(newObj);
+      persistTeams();
+      closeNewTeamModal();
+      document.getElementById('input-team-name').value = '';
+      document.getElementById('input-team-members').value = '';
+      renderTeamsSection();
+      populateDropdownTeams();
+    }
+
+    function removeTeam(id) {
+      if (teamsData.length <= 1) return;
+      teamsData = teamsData.filter(t => t.id !== id);
+      if (currentSelectedTeamId === id) currentSelectedTeamId = teamsData[0].id;
+      persistTeams();
+      renderTeamsSection();
+      populateDropdownTeams();
+    }
+
+    function pickTeamToSimulate(id) {
+      currentSelectedTeamId = id;
+      switchTab('simulator');
+    }
+
+    function populateDropdownTeams() {
+      const dropdown = document.getElementById('team-selector-dropdown');
+      if (!dropdown) return;
+      dropdown.innerHTML = '';
+
+      teamsData.forEach(t => {
+        const option = document.createElement('option');
+        option.value = t.id;
+        option.textContent = `${t.icon} ${t.name}`;
+        if (t.id === currentSelectedTeamId) option.selected = true;
+        dropdown.appendChild(option);
+      });
+
+      refreshSimulatorHeader();
+    }
+
+    function switchActiveTeam(id) {
+      currentSelectedTeamId = id;
+      syncSimulatorWithActiveTeam();
+    }
+
+    function refreshSimulatorHeader() {
+      const team = teamsData.find(t => t.id === currentSelectedTeamId);
+      if (!team) return;
+
+      document.getElementById('sim-team-icon').textContent = team.icon;
+      document.getElementById('sim-team-members').textContent = `Integrantes: ${team.members}`;
+    }
+
+    function syncSimulatorWithActiveTeam() {
+      refreshSimulatorHeader();
+      const team = teamsData.find(t => t.id === currentSelectedTeamId);
+      if (!team) return;
+
+      ['shipping', 'marketing', 'product', 'destiny'].forEach(category => {
+        const choice = team.decisions[category];
+        const radios = document.getElementsByName(`opt-${category}`);
+        radios.forEach(radio => {
+          radio.checked = (radio.value === choice);
+          updateDecisionCardStyle(radio);
+        });
+      });
+
+      runLiveRecalculation();
+    }
+
+    function handleDecisionChange(category, val) {
+      const team = teamsData.find(t => t.id === currentSelectedTeamId);
+      if (!team) return;
+
+      team.decisions[category] = val;
+      const radios = document.getElementsByName(`opt-${category}`);
+      radios.forEach(radio => updateDecisionCardStyle(radio));
+
+      runLiveRecalculation();
+    }
+
+    function updateDecisionCardStyle(radio) {
+      const parentCard = radio.closest('.decision-card');
+      if (!parentCard) return;
+      if (radio.checked) {
+        parentCard.classList.add('card-selected');
+      } else {
+        parentCard.classList.remove('card-selected');
+      }
+    }
+
+    function rollDestinyCard() {
+      const outcomes = ['1', '2', '3'];
+      const pick = outcomes[Math.floor(Math.random() * outcomes.length)];
+      handleDecisionChange('destiny', pick);
+      const radios = document.getElementsByName('opt-destiny');
+      radios.forEach(radio => {
+        radio.checked = (radio.value === pick);
+        updateDecisionCardStyle(radio);
+      });
+    }
+
+    function runLiveRecalculation() {
+      const team = teamsData.find(t => t.id === currentSelectedTeamId);
+      if (!team) return;
+
+      const fin = calculateTeamFinancials(team.decisions);
+
+      // Statement lines
+      document.getElementById('calc-revenue').textContent = `R$ ${fin.revenue.toLocaleString('pt-BR')}`;
+      document.getElementById('calc-cogs').textContent = `-R$ ${fin.cogs.toLocaleString('pt-BR')}`;
+      document.getElementById('calc-gross-profit').textContent = `R$ ${fin.grossProfit.toLocaleString('pt-BR')}`;
+      document.getElementById('calc-shipping').textContent = `-R$ ${fin.shipping.toLocaleString('pt-BR')}`;
+      document.getElementById('calc-marketing').textContent = `-R$ ${fin.marketing.toLocaleString('pt-BR')}`;
+      document.getElementById('calc-fixed').textContent = `-R$ ${fin.fixed.toLocaleString('pt-BR')}`;
+
+      const destinyEl = document.getElementById('calc-destiny');
+      if (fin.destinyImpact >= 0) {
+        destinyEl.textContent = `+R$ ${fin.destinyImpact.toLocaleString('pt-BR')}`;
+        destinyEl.className = 'font-bold text-emerald-400';
+      } else {
+        destinyEl.textContent = `-R$ ${Math.abs(fin.destinyImpact).toLocaleString('pt-BR')}`;
+        destinyEl.className = 'font-bold text-rose-400';
+      }
+
+      const netProfitEl = document.getElementById('calc-net-profit');
+      const badgeStatus = document.getElementById('calc-status-badge');
+      const quickProfit = document.getElementById('quick-profit-display');
+      const quickMargin = document.getElementById('quick-margin-display');
+
+      if (fin.netProfit >= 0) {
+        netProfitEl.textContent = `+R$ ${fin.netProfit.toLocaleString('pt-BR')}`;
+        netProfitEl.className = 'text-base font-extrabold text-emerald-400';
+        quickProfit.textContent = `+R$ ${fin.netProfit.toLocaleString('pt-BR')}`;
+        quickProfit.className = 'text-lg font-mono font-extrabold text-emerald-400';
+        badgeStatus.textContent = 'LUCRO SUSTENTÁVEL';
+        badgeStatus.className = 'text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+      } else {
+        netProfitEl.textContent = `-R$ ${Math.abs(fin.netProfit).toLocaleString('pt-BR')}`;
+        netProfitEl.className = 'text-base font-extrabold text-rose-400';
+        quickProfit.textContent = `-R$ ${Math.abs(fin.netProfit).toLocaleString('pt-BR')}`;
+        quickProfit.className = 'text-lg font-mono font-extrabold text-rose-400';
+        badgeStatus.textContent = 'EM PREJUÍZO';
+        badgeStatus.className = 'text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider bg-rose-500/20 text-rose-400 border border-rose-500/30';
+      }
+
+      document.getElementById('calc-net-margin').textContent = `${fin.netMargin}%`;
+      quickMargin.textContent = `${fin.netMargin}%`;
+      document.getElementById('calc-breakeven').textContent = `R$ ${fin.breakeven.toLocaleString('pt-BR')}`;
+      document.getElementById('calc-feedback-note').textContent = fin.feedback;
+    }
+
+    function saveCurrentDecisions(btn) {
+      persistTeams();
+      const prev = btn.innerHTML;
+      btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> Decisões Gravadas!`;
+      btn.classList.add('bg-emerald-600');
+      setTimeout(() => {
+        btn.innerHTML = prev;
+        btn.classList.remove('bg-emerald-600');
+      }, 1500);
+    }
+
+    function persistTeams() {
+      try {
+        localStorage.setItem('dropstore_game_teams', JSON.stringify(teamsData));
+      } catch (e) {}
+    }
+
+    // Leaderboard Section
+    function renderLeaderboardSection() {
+      const sorted = teamsData.map(t => {
+        return {
+          ...t,
+          financials: calculateTeamFinancials(t.decisions)
+        };
+      }).sort((a, b) => b.financials.netProfit - a.financials.netProfit);
+
+      // Top 3 Podium
+      const podium = document.getElementById('podium-cards-grid');
+      if (podium) {
+        podium.innerHTML = '';
+        const awards = [
+          { rank: '1º Lugar', crown: '👑', color: 'border-amber-400/50 shadow-amber-500/10', text: 'text-amber-300' },
+          { rank: '2º Lugar', crown: '🥈', color: 'border-slate-400/50', text: 'text-slate-300' },
+          { rank: '3º Lugar', crown: '🥉', color: 'border-amber-700/50', text: 'text-amber-600' }
+        ];
+
+        sorted.slice(0, 3).forEach((item, index) => {
+          const award = awards[index] || awards[2];
+          const isProfitable = item.financials.netProfit >= 0;
+
+          const card = document.createElement('div');
+          card.className = `p-6 rounded-3xl card-glass border ${award.color} relative overflow-hidden flex flex-col justify-between`;
+          card.innerHTML = `
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-black/60 ${award.text} border border-white/10 uppercase tracking-widest">${award.rank}</span>
+                <span class="text-3xl">${award.crown}</span>
+              </div>
+              <h4 class="font-display font-bold text-xl text-white">${item.name}</h4>
+              <p class="text-xs text-slate-400 mt-0.5">${item.members}</p>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-brand-border/60 space-y-2 font-mono">
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-slate-400">Lucro Líquido:</span>
+                <span class="font-extrabold text-base ${isProfitable ? 'text-emerald-400' : 'text-rose-400'}">R$ ${item.financials.netProfit.toLocaleString('pt-BR')}</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-slate-400">Margem Líquida:</span>
+                <span class="font-bold text-brand-cyan">${item.financials.netMargin}%</span>
+              </div>
+            </div>
+          `;
+          podium.appendChild(card);
+        });
+      }
+
+      // Full Table
+      const tbody = document.getElementById('ranking-table-rows');
+      if (tbody) {
+        tbody.innerHTML = '';
+        sorted.forEach((item, idx) => {
+          const isProfitable = item.financials.netProfit >= 0;
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-800/40 transition';
+          tr.innerHTML = `
+            <td class="py-3 px-3 font-bold ${idx === 0 ? 'text-amber-400 text-sm' : 'text-slate-400'}">${idx + 1}º</td>
+            <td class="py-3 px-3">
+              <div class="flex items-center gap-2">
+                <span>${item.icon}</span>
+                <div>
+                  <span class="font-bold text-white block">${item.name}</span>
+                  <span class="text-[10px] text-slate-400">${item.members}</span>
+                </div>
+              </div>
+            </td>
+            <td class="py-3 px-3">
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono text-[10px]">
+                F:${item.decisions.shipping} | M:${item.decisions.marketing} | P:${item.decisions.product}
+              </span>
+            </td>
+            <td class="py-3 px-3 font-extrabold ${isProfitable ? 'text-emerald-400' : 'text-rose-400'}">
+              R$ ${item.financials.netProfit.toLocaleString('pt-BR')}
+            </td>
+            <td class="py-3 px-3 font-bold text-brand-cyan">${item.financials.netMargin}%</td>
+            <td class="py-3 px-3">
+              ${item.financials.netMargin >= 14 ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Turnaround Perfeito</span>' : item.financials.netProfit >= 0 ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">Positivo</span>' : '<span class="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">Déficit</span>'}
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      updateRankingChart(sorted);
+    }
+
+    function triggerConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 120,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+      }
+    }
+
+    // Projector Modal
+    function toggleProjectorMode() {
+      const modal = document.getElementById('projector-fullscreen-modal');
+      const isHidden = modal.classList.contains('hidden');
+
+      if (isHidden) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        const sorted = teamsData.map(t => {
+          return {
+            ...t,
+            financials: calculateTeamFinancials(t.decisions)
+          };
+        }).sort((a, b) => b.financials.netProfit - a.financials.netProfit);
+
+        const container = document.getElementById('projector-cards-container');
+        container.innerHTML = '';
+
+        sorted.slice(0, 3).forEach((item, idx) => {
+          const isProfitable = item.financials.netProfit >= 0;
+          const card = document.createElement('div');
+          card.className = `p-8 rounded-3xl bg-brand-card border-2 ${idx === 0 ? 'border-amber-400 neon-purple' : 'border-brand-border'} flex flex-col justify-between space-y-6`;
+          card.innerHTML = `
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-sm font-extrabold px-3 py-1 rounded-full bg-black/60 text-amber-400 border border-amber-400/30">#${idx + 1} LUGAR</span>
+                <span class="text-4xl">${item.icon}</span>
+              </div>
+              <h3 class="font-display text-2xl font-black text-white leading-tight">${item.name}</h3>
+              <p class="text-sm text-slate-400 mt-1">${item.members}</p>
+            </div>
+
+            <div class="space-y-3 font-mono pt-4 border-t border-brand-border">
+              <div>
+                <span class="text-xs text-slate-400 uppercase font-bold block">Lucro Líquido Final</span>
+                <span class="text-3xl font-black ${isProfitable ? 'text-emerald-400' : 'text-rose-400'}">R$ ${item.financials.netProfit.toLocaleString('pt-BR')}</span>
+              </div>
+              <div>
+                <span class="text-xs text-slate-400 uppercase font-bold block">Margem Líquida</span>
+                <span class="text-xl font-bold text-brand-cyan">${item.financials.netMargin}%</span>
+              </div>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+
+        if (sorted.length > 0) {
+          document.getElementById('proj-metric-profit').textContent = `R$ ${sorted[0].financials.netProfit.toLocaleString('pt-BR')}`;
+          document.getElementById('proj-metric-margin').textContent = `${sorted[0].financials.netMargin}%`;
+        }
+        document.getElementById('proj-metric-teams').textContent = `${teamsData.length} Equipes`;
+
+        triggerConfetti();
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function resetAllDefaults() {
+      teamsData = JSON.parse(JSON.stringify(SEED_TEAMS));
+      currentSelectedTeamId = teamsData[0].id;
+      persistTeams();
+      renderTeamsSection();
+      populateDropdownTeams();
+      syncSimulatorWithActiveTeam();
+      renderLeaderboardSection();
+    }
+
+    // App Initialization
+    window.addEventListener('DOMContentLoaded', () => {
+      initInitialChart();
+      renderTeamsSection();
+      populateDropdownTeams();
+      syncSimulatorWithActiveTeam();
+      renderLeaderboardSection();
+    });
+  </script>
+</body>
+</html>
