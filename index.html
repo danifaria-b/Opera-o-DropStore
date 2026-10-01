@@ -106,7 +106,7 @@
             </span>
             <h2 class="text-2xl lg:text-3xl font-urban font-bold text-white">A DropStore bateu recorde de visualizações, mas fechou no vermelho.</h2>
             <p class="text-sm text-gray-400 leading-relaxed">
-              Sua equipe assumiu a diretoria executiva neste trimestre. Analisem o <strong>DRE Gerencial</strong> e os <strong>Relatórios por Produto</strong> abaixo para identificar onde estão as torneiras abertas antes de enviar suas propostas de decisão.
+              Sua equipe assumiu a diretoria executiva neste trimestre. Analisem o <strong>DRE Gerencial</strong> e os <strong>Relatórios por Produto</strong> abaixo para identificar onde estão as torneiras abertas antes de formalizar sua proposta.
             </p>
           </div>
           <div class="flex flex-row md:flex-col items-center md:items-end justify-between bg-black/40 p-4 rounded-xl border border-gray-800 shrink-0">
@@ -184,7 +184,7 @@
 
           <div class="p-3 rounded-xl bg-gray-900/80 border border-gray-800 text-xs text-gray-400 flex items-start gap-2">
             <i data-lucide="info" class="w-4 h-4 text-violet-400 shrink-0 mt-0.5"></i>
-            <span><strong>Regra Gerencial:</strong> O Ponto de Equilíbrio atual exige R$ 62.000,00 de faturamento para não ter prejuízo. A empresa faturou R$ 60.000,00, gerando o déficit de R$ 2.000,00.</span>
+            <span><strong>Regra Gerencial:</strong> O Ponto de Equilíbrio atual exige R$ 62.000,00 de faturamento para zerar os custos. Com R$ 60.000,00 de receita, a marca gerou o déficit operacional.</span>
           </div>
         </div>
 
@@ -255,34 +255,28 @@
     <!-- ========================================== -->
     <section id="view-teams" class="space-y-6 hidden">
 
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-4 rounded-xl border border-gray-800">
+      <div class="glass-card p-4 rounded-xl border border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 class="text-xl font-urban font-bold text-white">Comitê de Decisão Executiva</h2>
-          <p class="text-xs text-gray-400">Preencha o nome do grupo e selecione a alternativa escolhida após analisar os demonstrativos.</p>
-        </div>
-        <div class="flex items-center gap-2">
-          <label for="select-team-active" class="text-xs text-gray-400">Equipe em Sessão:</label>
-          <select id="select-team-active" onchange="loadTeamForm()" class="bg-gray-900 border border-gray-700 text-white text-sm rounded-lg px-3 py-1.5 focus:border-violet-500 focus:outline-none">
-            <!-- Gerado via JS -->
-          </select>
+          <p class="text-xs text-gray-400">Preencham o formulário da equipe. Ao finalizar, será gerado o <strong>Código de Protocolo</strong> oficial para envio ao professor.</p>
         </div>
       </div>
 
-      <form id="decision-form" onsubmit="submitTeamDecisions(event)" class="space-y-6">
+      <form id="decision-form" onsubmit="generateSubmissionCode(event)" class="space-y-6">
 
         <!-- Informações do Grupo -->
         <div class="glass-card rounded-2xl p-5 border border-gray-800 grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">Nome da Diretoria / Grupo</label>
-            <input type="text" id="input-team-name" required placeholder="Ex: Equipe Alfa Consultoria" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-violet-500 focus:outline-none">
+            <input type="text" id="input-team-name" required placeholder="Ex: Diretoria Alpha" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-violet-500 focus:outline-none">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">Integrantes do Comitê</label>
-            <input type="text" id="input-team-members" required placeholder="Ex: Lucas, Sofia, Pedro e Mariana" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-violet-500 focus:outline-none">
+            <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">Integrantes da Equipe</label>
+            <input type="text" id="input-team-members" required placeholder="Ex: Mariana, Pedro, Enzo e Letícia" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-violet-500 focus:outline-none">
           </div>
         </div>
 
-        <!-- 3 Blocos de Decisão (Sem valores de gabarito para os alunos analisarem) -->
+        <!-- 3 Blocos de Decisão -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           <!-- Bloco 1: Logística e Frete -->
@@ -293,7 +287,7 @@
                 <h3 class="font-urban font-bold text-white text-base">Decisão 1: Política de Frete</h3>
               </div>
               <p class="text-xs text-gray-400 mb-4">
-                A loja gastou R$ 11.000 em fretes absorvidos. Como sua diretoria vai reestruturar essa política de entrega?
+                A loja gastou R$ 11.000 em entregas gratuitas. Qual a estratégia do grupo?
               </p>
 
               <div class="space-y-2.5">
@@ -301,7 +295,7 @@
                   <input type="radio" name="dec-frete" value="A" required class="mt-1 text-violet-600 focus:ring-violet-500">
                   <div class="text-xs">
                     <strong class="text-white block font-semibold">Opção A: Extinção do Frete Grátis</strong>
-                    <span class="text-gray-400">Repassar o valor integral do frete para o consumidor final em qualquer compra.</span>
+                    <span class="text-gray-400">Repassar o frete integralmente ao cliente em todas as compras.</span>
                   </div>
                 </label>
 
@@ -309,7 +303,7 @@
                   <input type="radio" name="dec-frete" value="B" class="mt-1 text-violet-600 focus:ring-violet-500">
                   <div class="text-xs">
                     <strong class="text-white block font-semibold">Opção B: Frete Grátis com Ticket Mínimo</strong>
-                    <span class="text-gray-400">Conceder gratuidade de entrega apenas para compras a partir de R$ 200,00.</span>
+                    <span class="text-gray-400">Frete grátis apenas para pedidos acima de R$ 200,00.</span>
                   </div>
                 </label>
 
@@ -317,7 +311,7 @@
                   <input type="radio" name="dec-frete" value="C" class="mt-1 text-violet-600 focus:ring-violet-500">
                   <div class="text-xs">
                     <strong class="text-white block font-semibold">Opção C: Troca por Transportadora Econômica</strong>
-                    <span class="text-gray-400">Manter o frete grátis irrestrito, mas migrar para um operador logístico com prazo de entrega mais longo.</span>
+                    <span class="text-gray-400">Frete grátis mantido, mas com operador de entrega mais lento.</span>
                   </div>
                 </label>
               </div>
@@ -332,7 +326,7 @@
                 <h3 class="font-urban font-bold text-white text-base">Decisão 2: Tráfego e Marketing</h3>
               </div>
               <p class="text-xs text-gray-400 mb-4">
-                Foram gastos R$ 15.000 em campanhas digitais. Qual é o plano de alocação de verba do grupo?
+                Foram gastos R$ 15.000 em campanhas digitais. Qual o plano de investimento?
               </p>
 
               <div class="space-y-2.5">
@@ -340,15 +334,15 @@
                   <input type="radio" name="dec-mkt" value="A" required class="mt-1 text-fuchsia-600 focus:ring-fuchsia-500">
                   <div class="text-xs">
                     <strong class="text-white block font-semibold">Opção A: Foco no Produto Carro-Chefe</strong>
-                    <span class="text-gray-400">Pausar imediatamente anúncios de bonés e concentrar orçamento somente nas camisetas oversized.</span>
+                    <span class="text-gray-400">Pausar anúncios de bonés e focar verba nas camisetas oversized.</span>
                   </div>
                 </label>
 
                 <label class="flex items-start gap-3 p-3 rounded-xl bg-gray-900/60 border border-gray-800 hover:border-fuchsia-500 cursor-pointer transition">
                   <input type="radio" name="dec-mkt" value="B" class="mt-1 text-fuchsia-600 focus:ring-fuchsia-500">
                   <div class="text-xs">
-                    <strong class="text-white block font-semibold">Opção B: Parceria com Criadores de Conteúdo</strong>
-                    <span class="text-gray-400">Reduzir os anúncios tradicionais e contratar 3 microinfluenciadores de streetwear no TikTok.</span>
+                    <strong class="text-white block font-semibold">Opção B: Criadores de Conteúdo (TikTok)</strong>
+                    <span class="text-gray-400">Contratar 3 microinfluenciadores de streetwear e reduzir anúncios pagos tradicionais.</span>
                   </div>
                 </label>
 
@@ -356,7 +350,7 @@
                   <input type="radio" name="dec-mkt" value="C" class="mt-1 text-fuchsia-600 focus:ring-fuchsia-500">
                   <div class="text-xs">
                     <strong class="text-white block font-semibold">Opção C: Corte Linear de Verba</strong>
-                    <span class="text-gray-400">Reduzir pela metade o orçamento de publicidade em todas as redes sociais sem distinção.</span>
+                    <span class="text-gray-400">Reduzir pela metade o orçamento de publicidade em todas as redes.</span>
                   </div>
                 </label>
               </div>
@@ -371,7 +365,7 @@
                 <h3 class="font-urban font-bold text-white text-base">Decisão 3: Estratégia de Produtos</h3>
               </div>
               <p class="text-xs text-gray-400 mb-4">
-                O boné gera margem apertada (R$ 25 de lucro bruto vs R$ 80 da camiseta). O que fazer?
+                O boné deixa apenas R$ 25 de lucro bruto (vs R$ 80 da camiseta). O que fazer?
               </p>
 
               <div class="space-y-2.5">
@@ -379,7 +373,7 @@
                   <input type="radio" name="dec-prod" value="A" required class="mt-1 text-cyan-600 focus:ring-cyan-500">
                   <div class="text-xs">
                     <strong class="text-white block font-semibold">Opção A: Descontinuação da Linha</strong>
-                    <span class="text-gray-400">Encerrar a produção do boné snapback e liquidar o estoque restante para gerar caixa rápido.</span>
+                    <span class="text-gray-400">Encerrar a produção do boné e liquidar estoque restante.</span>
                   </div>
                 </label>
 
@@ -387,7 +381,7 @@
                   <input type="radio" name="dec-prod" value="B" class="mt-1 text-cyan-600 focus:ring-cyan-500">
                   <div class="text-xs">
                     <strong class="text-white block font-semibold">Opção B: Kit Promocional Casado (Combo)</strong>
-                    <span class="text-gray-400">Criar o pacote "Camiseta + Boné" por R$ 150, estimulando a compra conjunta de ambos os itens.</span>
+                    <span class="text-gray-400">Vender o combo "Camiseta + Boné" por R$ 150 para elevar o volume conjunto.</span>
                   </div>
                 </label>
 
@@ -395,7 +389,7 @@
                   <input type="radio" name="dec-prod" value="C" class="mt-1 text-cyan-600 focus:ring-cyan-500">
                   <div class="text-xs">
                     <strong class="text-white block font-semibold">Opção C: Reposicionamento de Preço</strong>
-                    <span class="text-gray-400">Reajustar o preço unitário do boné de R$ 60 para R$ 75 para recompor a margem unitária.</span>
+                    <span class="text-gray-400">Reajustar o preço unitário do boné de R$ 60 para R$ 75.</span>
                   </div>
                 </label>
               </div>
@@ -409,14 +403,14 @@
           <label class="block text-xs font-semibold text-gray-300 uppercase">
             Defesa Estratégica do Comitê (Explicação para a Mesa Diretora)
           </label>
-          <textarea id="input-team-argument" rows="3" required placeholder="Expliquem de forma resumida por que essas 3 decisões eliminam o prejuízo de R$ -2.000,00 sem comprometer a saúde da DropStore..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-sm text-white focus:border-violet-500 focus:outline-none"></textarea>
+          <textarea id="input-team-argument" rows="3" required placeholder="Expliquem de forma resumida por que essas decisões eliminam o prejuízo de R$ -2.000,00 sem comprometer a saúde da marca..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-sm text-white focus:border-violet-500 focus:outline-none"></textarea>
         </div>
 
-        <!-- Botão de Envio -->
+        <!-- Botão de Envio / Geração de Código -->
         <div class="flex items-center justify-end gap-3">
           <button type="submit" class="px-6 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-bold text-sm hover:from-violet-500 hover:to-fuchsia-500 shadow-lg shadow-violet-600/30 transition flex items-center gap-2">
-            <i data-lucide="check-circle" class="w-4 h-4"></i>
-            <span>Submeter Plano de Decisão Oficial</span>
+            <i data-lucide="key" class="w-4 h-4"></i>
+            <span>Gerar Código de Envio da Proposta</span>
           </button>
         </div>
 
@@ -480,6 +474,50 @@
   </main>
 
   <!-- ========================================== -->
+  <!-- MODAL DE RECIBO / CÓDIGO DO ALUNO          -->
+  <!-- ========================================== -->
+  <div id="modal-receipt" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="bg-gray-900 border border-violet-500/40 rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl relative">
+      <div class="text-center space-y-2">
+        <div class="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mx-auto">
+          <i data-lucide="check" class="w-6 h-6"></i>
+        </div>
+        <h3 class="font-urban font-bold text-xl text-white">Proposta Lacrada com Sucesso!</h3>
+        <p class="text-xs text-gray-400">Apresente este código para o professor ou envie o comprovante por e-mail.</p>
+      </div>
+
+      <!-- Caixa de Destaque do Código -->
+      <div class="p-4 rounded-xl bg-black/60 border border-gray-800 text-center space-y-1">
+        <span class="text-[11px] font-semibold uppercase text-violet-400">Código de Protocolo do Comitê</span>
+        <div id="display-receipt-code" class="text-2xl sm:text-3xl font-mono font-bold text-emerald-400 tracking-wider">
+          DROP-XXXX
+        </div>
+        <p class="text-[11px] text-gray-500">Este código sintetiza as decisões estratégicas do seu grupo.</p>
+      </div>
+
+      <!-- Resumo da Decisão -->
+      <div id="receipt-summary" class="text-xs text-gray-300 p-3 rounded-lg bg-gray-800/50 space-y-1">
+        <!-- Preenchido via JS -->
+      </div>
+
+      <!-- Ações de Envio -->
+      <div class="space-y-2 pt-2">
+        <button onclick="sendViaEmail()" class="w-full py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs uppercase flex items-center justify-center gap-2 transition">
+          <i data-lucide="mail" class="w-4 h-4"></i>
+          <span>Enviar Comprovante por E-mail</span>
+        </button>
+        <button onclick="copyReceiptCode()" class="w-full py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold text-xs flex items-center justify-center gap-2 transition">
+          <i data-lucide="copy" class="w-4 h-4"></i>
+          <span>Copiar Código</span>
+        </button>
+        <button onclick="closeReceiptModal()" class="w-full py-2 text-xs text-gray-400 hover:text-white">
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
   <!-- MODAL: PAINEL DA MESA DIRETORA (PROFESSOR) -->
   <!-- ========================================== -->
   <div id="modal-teacher" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
@@ -492,8 +530,8 @@
             <i data-lucide="shield-check" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="font-urban font-bold text-lg text-white">Mesa Diretora & Facilitação</h3>
-            <p class="text-xs text-gray-400">Controle da dinâmica e apuração dos demonstrativos</p>
+            <h3 class="font-urban font-bold text-lg text-white">Mesa Diretora & Apuração</h3>
+            <p class="text-xs text-gray-400">Controle da dinâmica e importação de protocolos</p>
           </div>
         </div>
         <button onclick="closeTeacherModal()" class="text-gray-400 hover:text-white p-1">
@@ -515,33 +553,48 @@
 
       <!-- Controles Restritos (Aparece após desbloquear) -->
       <div id="teacher-controls" class="space-y-6 hidden">
+
+        <!-- IMPORTAÇÃO RÁPIDA DE CÓDIGO ENVIADO PELOS ALUNOS -->
+        <div class="p-4 rounded-xl bg-violet-950/30 border border-violet-800/40 space-y-3">
+          <div class="flex items-center gap-2 text-violet-400">
+            <i data-lucide="scan-barcode" class="w-5 h-5"></i>
+            <span class="text-xs font-semibold uppercase">Lançar Código Recebido de Grupo</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <input type="text" id="input-import-name" placeholder="Nome da Equipe (Ex: Grupo 1)" class="bg-black/60 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-violet-500">
+            <input type="text" id="input-import-code" placeholder="Código (Ex: DROP-BBA-98)" class="bg-black/60 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white uppercase font-mono focus:outline-none focus:border-violet-500">
+            <button onclick="importTeamCode()" class="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs uppercase rounded-xl transition">
+              Processar Código
+            </button>
+          </div>
+        </div>
         
         <!-- Sorteio da Carta do Destino Global -->
         <div class="p-4 rounded-xl bg-black/40 border border-gray-800 space-y-3">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold uppercase text-violet-400">Conjuntura de Mercado (Carta do Destino)</span>
+            <span class="text-xs font-semibold uppercase text-amber-400">Conjuntura de Mercado (Carta do Destino)</span>
             <span id="current-drawn-event-badge" class="text-xs px-2 py-0.5 rounded bg-gray-800 text-gray-300">Pendente</span>
           </div>
           
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-            <button onclick="setEvent(1)" class="p-2.5 text-left text-xs rounded-lg border border-gray-700 bg-gray-800/60 hover:border-violet-500">
+            <button onclick="setEvent(1)" class="p-2.5 text-left text-xs rounded-lg border border-gray-700 bg-gray-800/60 hover:border-amber-500">
               <strong>1. Viralizou no TikTok</strong>
               <p class="text-[11px] text-gray-400 mt-1">Beneficia quem investiu em Influenciadores.</p>
             </button>
-            <button onclick="setEvent(2)" class="p-2.5 text-left text-xs rounded-lg border border-gray-700 bg-gray-800/60 hover:border-violet-500">
+            <button onclick="setEvent(2)" class="p-2.5 text-left text-xs rounded-lg border border-gray-700 bg-gray-800/60 hover:border-amber-500">
               <strong>2. Greve Logística</strong>
               <p class="text-[11px] text-gray-400 mt-1">Prejudica quem usou transportadora barata/lenta.</p>
             </button>
-            <button onclick="setEvent(3)" class="p-2.5 text-left text-xs rounded-lg border border-gray-700 bg-gray-800/60 hover:border-violet-500">
+            <button onclick="setEvent(3)" class="p-2.5 text-left text-xs rounded-lg border border-gray-700 bg-gray-800/60 hover:border-amber-500">
               <strong>3. Inflação do Algodão</strong>
-              <p class="text-[11px] text-gray-400 mt-1">Custo unitário de produção sobe para todos.</p>
+              <p class="text-[11px] text-gray-400 mt-1">Custo unitário de confecção sobe para todos.</p>
             </button>
           </div>
         </div>
 
-        <!-- Lista de Propostas Recebidas das Equipes -->
+        <!-- Lista de Propostas Cadastradas na Apuração -->
         <div class="space-y-2">
-          <span class="text-xs font-semibold uppercase text-gray-400">Propostas Submetidas pelas Equipes</span>
+          <span class="text-xs font-semibold uppercase text-gray-400">Equipes Computadas no Pódio</span>
           <div id="teacher-teams-list" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
             <!-- Gerado via JS -->
           </div>
@@ -550,11 +603,11 @@
         <!-- Ações do Professor -->
         <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-gray-800">
           <button onclick="resetAllTeams()" class="text-xs text-rose-400 hover:text-rose-300">
-            Reiniciar Simulação
+            Limpar Todos os Grupos
           </button>
           <button onclick="processAndPublishLeaderboard()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase flex items-center justify-center gap-2">
             <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-            <span>Calcular & Publicar Pódio Geral</span>
+            <span>Publicar Pódio no Telão</span>
           </button>
         </div>
 
@@ -571,8 +624,9 @@
   <!-- JAVASCRIPT: MOTOR DE CÁLCULO E REGRAS      -->
   <!-- ========================================== -->
   <script>
-    // CHAVE DE ACESSO DO PROFESSOR (ALTERÁVEL)
-    let TEACHER_PIN = "1234";
+    // CONFIGURAÇÕES DO PROFESSOR (ALTERE CONFORME SUA PREFERÊNCIA)
+    const TEACHER_PIN = "1234";
+    const TEACHER_EMAIL = "professora@escola.gov.br"; // Insira aqui seu e-mail para receber as propostas
 
     // MODELO DE DADOS DAS DIRETORIAS
     let teams = [
@@ -581,33 +635,18 @@
         name: "Diretoria Alpha",
         members: "Mariana, Pedro e Letícia",
         decisions: { frete: "B", mkt: "B", prod: "B" },
-        argument: "Adotamos o frete com valor mínimo para elevar o tíquete médio, investimos em criadores do TikTok para rejuvenescer a marca e apostamos no combo para girar os bonés mantendo a margem do conjunto.",
-        financials: null
-      },
-      {
-        id: "2",
-        name: "Diretoria Beta",
-        members: "Lucas, Gabriel e Amanda",
-        decisions: { frete: "A", mkt: "A", prod: "A" },
-        argument: "Focamos em corte agressivo de custos desnecessários: acabamos com o frete grátis, cortamos anúncios do produto ruim e liquidamos a linha do boné para recuperar o caixa.",
-        financials: null
-      },
-      {
-        id: "3",
-        name: "Diretoria Gamma",
-        members: "Enzo, Beatriz e Matheus",
-        decisions: { frete: "C", mkt: "C", prod: "C" },
-        argument: "Preferimos não mexer radicalmente nos preços nem abandonar os produtos, optando por cortes lineares de publicidade e transportadora econômica.",
+        argument: "Adotamos o frete com ticket mínimo de R$ 200 para forçar combos e contratamos os tiktokers para focar no público jovem.",
         financials: null
       }
     ];
 
     let currentMarketEvent = 0; // 0 = Sem evento sorteado
+    let lastGeneratedData = null; // Armazena dados do comprovante atual
 
     const MARKET_EVENTS = {
       1: {
         title: "Viralizou no TikTok!",
-        desc: "Um criador relevante vestiu a oversized espontaneamente: grupos que escolheram a Opção B de Marketing recebem bônus imediato de R$ 4.000 em vendas!",
+        desc: "Um criador relevante vestiu a oversized espontaneamente: grupos que escolheram a Opção B de Marketing recebem bônus de R$ 4.000 em vendas!",
         badge: "TikTok Trend (+R$ 4k)"
       },
       2: {
@@ -617,22 +656,20 @@
       },
       3: {
         title: "Alta Internacional do Tecido",
-        desc: "O algodão sofreu reajuste global de insumo: os custos de confecção sobem 8% para todas as marcas.",
+        desc: "O algodão sofreu reajuste de insumo: os custos de confecção sobem 8% para todas as marcas.",
         badge: "Algodão em Alta (-8% Margem)"
       }
     };
 
-    // INICIALIZAÇÃO DA APLICAÇÃO
+    // INICIALIZAÇÃO
     window.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
       initCostChart();
-      updateTeamDropdown();
-      loadTeamForm();
       calculateAllTeams();
       renderLeaderboard();
     });
 
-    // CONTROLE DE NAVEGAÇÃO DE ABAS
+    // CONTROLE DE NAVEGAÇÃO
     function switchTab(tabId) {
       document.querySelectorAll('section[id^="view-"]').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -651,7 +688,7 @@
       lucide.createIcons();
     }
 
-    // GRÁFICO DE DEMONSTRATIVO DE CUSTOS (CHART.JS)
+    // GRÁFICO DE COMPOSIÇÃO DE CUSTOS (DRE)
     function initCostChart() {
       const ctx = document.getElementById('costBreakdownChart');
       if (!ctx) return;
@@ -668,68 +705,15 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false }
-          },
+          plugins: { legend: { display: false } },
           cutout: '72%'
         }
       });
     }
 
-    // ATUALIZAÇÃO DO SELETOR DE EQUIPES NA ABA DO ALUNO
-    function updateTeamDropdown() {
-      const select = document.getElementById('select-team-active');
-      if (!select) return;
-      select.innerHTML = '';
-      teams.forEach((t, index) => {
-        const opt = document.createElement('option');
-        opt.value = t.id;
-        opt.textContent = `${t.name}`;
-        select.appendChild(opt);
-      });
-      const newOpt = document.createElement('option');
-      newOpt.value = "new";
-      newOpt.textContent = "+ Cadastrar Nova Diretoria";
-      select.appendChild(newOpt);
-    }
-
-    // CARREGAR DADOS NO FORMULÁRIO DO ALUNO
-    function loadTeamForm() {
-      const select = document.getElementById('select-team-active');
-      const teamId = select.value;
-
-      if (teamId === "new") {
-        document.getElementById('input-team-name').value = "";
-        document.getElementById('input-team-members').value = "";
-        document.getElementById('input-team-argument').value = "";
-        document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
-        return;
-      }
-
-      const team = teams.find(t => t.id === teamId);
-      if (team) {
-        document.getElementById('input-team-name').value = team.name;
-        document.getElementById('input-team-members').value = team.members;
-        document.getElementById('input-team-argument').value = team.argument || "";
-
-        if (team.decisions) {
-          setRadioValue('dec-frete', team.decisions.frete);
-          setRadioValue('dec-mkt', team.decisions.mkt);
-          setRadioValue('dec-prod', team.decisions.prod);
-        }
-      }
-    }
-
-    function setRadioValue(name, val) {
-      const radio = document.querySelector(`input[name="${name}"][value="${val}"]`);
-      if (radio) radio.checked = true;
-    }
-
-    // SUBMISSÃO DA TOMADA DE DECISÃO
-    function submitTeamDecisions(e) {
+    // GERAÇÃO DO CÓDIGO DE PROTOCOLO DA EQUIPE
+    function generateSubmissionCode(e) {
       e.preventDefault();
-      const select = document.getElementById('select-team-active');
-      const isNew = select.value === "new";
 
       const name = document.getElementById('input-team-name').value;
       const members = document.getElementById('input-team-members').value;
@@ -744,37 +728,62 @@
         return;
       }
 
-      if (isNew) {
-        const newTeam = {
-          id: String(Date.now()),
-          name,
-          members,
-          argument,
-          decisions: { frete, mkt, prod },
-          financials: null
-        };
-        teams.push(newTeam);
-        updateTeamDropdown();
-        select.value = newTeam.id;
-      } else {
-        const team = teams.find(t => t.id === select.value);
-        if (team) {
-          team.name = name;
-          team.members = members;
-          team.argument = argument;
-          team.decisions = { frete, mkt, prod };
-        }
-      }
+      // Hash simples de 2 dígitos baseado no argumento para autenticidade
+      const hash = Math.floor(10 + Math.random() * 89);
+      const code = `DROP-${frete}${mkt}${prod}-${hash}`;
 
-      calculateAllTeams();
-      renderLeaderboard();
-      alert("Proposta de decisão enviada com sucesso! Aguarde a apuração da Mesa Diretora.");
-      switchTab('results');
+      lastGeneratedData = {
+        name,
+        members,
+        argument,
+        decisions: { frete, mkt, prod },
+        code
+      };
+
+      // Exibir no Modal de Recibo
+      document.getElementById('display-receipt-code').textContent = code;
+      document.getElementById('receipt-summary').innerHTML = `
+        <p><strong>Equipe:</strong> ${name}</p>
+        <p><strong>Integrantes:</strong> ${members}</p>
+        <p><strong>Decisões Selecionadas:</strong> Frete [${frete}] | Mkt [${mkt}] | Produto [${prod}]</p>
+      `;
+
+      document.getElementById('modal-receipt').classList.remove('hidden');
+    }
+
+    function closeReceiptModal() {
+      document.getElementById('modal-receipt').classList.add('hidden');
+    }
+
+    function copyReceiptCode() {
+      if (!lastGeneratedData) return;
+      navigator.clipboard.writeText(lastGeneratedData.code);
+      alert("Código copiado para a área de transferência!");
+    }
+
+    function sendViaEmail() {
+      if (!lastGeneratedData) return;
+      const d = lastGeneratedData;
+      const subject = encodeURIComponent(`[DropStore] Proposta Oficial - ${d.name} (${d.code})`);
+      const body = encodeURIComponent(
+        `RELATÓRIO DE TOMADA DE DECISÃO - DROPSTORE\n\n` +
+        `Equipe: ${d.name}\n` +
+        `Integrantes: ${d.members}\n` +
+        `CÓDIGO DE PROTOCOLO: ${d.code}\n\n` +
+        `ESCOLHAS:\n` +
+        `- Decisão 1 (Frete): Opção ${d.decisions.frete}\n` +
+        `- Decisão 2 (Marketing): Opção ${d.decisions.mkt}\n` +
+        `- Decisão 3 (Portfólio): Opção ${d.decisions.prod}\n\n` +
+        `JUSTIFICATIVA ESTRATÉGICA DO GRUPO:\n` +
+        `"${d.argument}"\n\n` +
+        `Enviado via Simulador Gerencial DropStore.`
+      );
+
+      window.location.href = `mailto:${TEACHER_EMAIL}?subject=${subject}&body=${body}`;
     }
 
     // MOTOR DE CÁLCULO FINANCEIRO
     function calculateFinancials(decisions, eventId) {
-      // Cenário Base
       let receita = 60000;
       let cmv = 24000;
       let frete = 11000;
@@ -783,58 +792,54 @@
 
       // IMPACTO 1: POLÍTICA DE FRETE
       if (decisions.frete === 'A') {
-        frete = 2000; // Economiza 9000
-        receita *= 0.88; // Perda de 12% em carrinhos abandonados
+        frete = 2000;
+        receita *= 0.88;
         cmv *= 0.88;
       } else if (decisions.frete === 'B') {
-        frete = 5500; // Economiza 5500
-        receita *= 1.10; // Aumento de 10% no ticket médio
+        frete = 5500;
+        receita *= 1.10;
         cmv *= 1.05;
       } else if (decisions.frete === 'C') {
-        frete = 9000; // Economia tímida de 2000
-        receita *= 0.95; // 5% de devoluções/cancelamentos
+        frete = 9000;
+        receita *= 0.95;
         cmv *= 0.96;
       }
 
       // IMPACTO 2: MARKETING & ANÚNCIOS
       if (decisions.mkt === 'A') {
-        mkt = 8000; // Economia de 7000
+        mkt = 8000;
         receita *= 0.92;
         cmv *= 0.92;
       } else if (decisions.mkt === 'B') {
-        mkt = 9000; // 5000 tráfego + 4000 influenciadores
-        receita += 6000; // +50 pedidos de camiseta (50 * R$ 120)
+        mkt = 9000;
+        receita += 6000;
         cmv += 2000;
       } else if (decisions.mkt === 'C') {
-        mkt = 7500; // Cortou 50%
-        receita *= 0.78; // Queda brutal de 22% em receita
+        mkt = 7500;
+        receita *= 0.78;
         cmv *= 0.78;
       }
 
       // IMPACTO 3: GESTÃO DO MIX DE PRODUTO
       if (decisions.prod === 'A') {
-        receita -= 12000; // Perde as vendas do boné (200 * 60)
-        cmv -= 7000;      // Elimina o CMV do boné (200 * 35)
-        receita += 4000;  // Venda do estoque residual
+        receita -= 12000;
+        cmv -= 7000;
+        receita += 4000;
       } else if (decisions.prod === 'B') {
-        receita += 4500;  // Volume adicional gerado pelos combos
+        receita += 4500;
         cmv += 1800;
       } else if (decisions.prod === 'C') {
-        receita -= 4500;  // Queda de 50% nas vendas do boné
+        receita -= 4500;
         cmv -= 3500;
       }
 
-      // IMPACTO 4: CARTA DO DESTINO (EVENTO DE MERCADO)
-      if (eventId === 1) { // Trend TikTok
-        if (decisions.mkt === 'B') {
-          receita += 4000;
-          cmv += 1200;
-        }
-      } else if (eventId === 2) { // Greve Logística
-        if (decisions.frete === 'C') {
-          receita -= 3000;
-        }
-      } else if (eventId === 3) { // Alta do Tecido
+      // IMPACTO 4: CARTA DO DESTINO
+      if (eventId === 1 && decisions.mkt === 'B') {
+        receita += 4000;
+        cmv += 1200;
+      } else if (eventId === 2 && decisions.frete === 'C') {
+        receita -= 3000;
+      } else if (eventId === 3) {
         cmv *= 1.08;
       }
 
@@ -842,7 +847,6 @@
       const despesasTotais = frete + mkt + fixo;
       const lucroLiquido = lucroBruto - despesasTotais;
       const margemLiquida = (lucroLiquido / receita) * 100;
-      const breakEven = despesasTotais / (lucroBruto / receita);
 
       return {
         receita,
@@ -852,8 +856,7 @@
         mkt,
         fixo,
         lucroLiquido,
-        margemLiquida,
-        breakEven
+        margemLiquida
       };
     }
 
@@ -871,7 +874,6 @@
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      // Ordenar por maior Lucro Líquido
       const sortedTeams = [...teams].sort((a, b) => {
         const valA = a.financials ? a.financials.lucroLiquido : -99999;
         const valB = b.financials ? b.financials.lucroLiquido : -99999;
@@ -893,7 +895,7 @@
           if (fin.lucroLiquido > 4000) {
             statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Escala Saudável</span>`;
           } else if (fin.lucroLiquido > 0) {
-            statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">Operação Lucrativa</span>`;
+            statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">Lucro Operacional</span>`;
           } else {
             statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">Prejuízo</span>`;
           }
@@ -903,7 +905,7 @@
           <td class="py-3.5 px-4">${rankBadge}</td>
           <td class="py-3.5 px-4">
             <strong class="text-white block">${team.name}</strong>
-            <span class="text-xs text-gray-400">${team.members}</span>
+            <span class="text-xs text-gray-400">${team.members || ''}</span>
           </td>
           <td class="py-3.5 px-4 font-mono text-xs text-violet-400">
             ${team.decisions ? `[${team.decisions.frete}] [${team.decisions.mkt}] [${team.decisions.prod}]` : '-'}
@@ -923,7 +925,50 @@
       });
     }
 
-    // MODAL DA MESA DIRETORA (PROFESSOR)
+    // IMPORTAÇÃO DE CÓDIGO NO PAINEL DO PROFESSOR
+    function importTeamCode() {
+      const nameInput = document.getElementById('input-import-name');
+      const codeInput = document.getElementById('input-import-code');
+
+      const name = nameInput.value.trim();
+      const code = codeInput.value.trim().toUpperCase();
+
+      if (!name || !code) {
+        alert("Preencha o nome do grupo e o código recebido.");
+        return;
+      }
+
+      // Formato esperado: DROP-ABC-XX ou apenas ABC
+      let cleanCode = code.replace("DROP-", "");
+      let letters = cleanCode.substring(0, 3); // Extrai as 3 letras
+
+      if (letters.length !== 3) {
+        alert("Código inválido! O código deve conter as 3 letras das decisões (ex: DROP-BBB-84).");
+        return;
+      }
+
+      const frete = letters[0];
+      const mkt = letters[1];
+      const prod = letters[2];
+
+      const newTeam = {
+        id: String(Date.now()),
+        name: name,
+        members: `Protocolo: ${code}`,
+        decisions: { frete, mkt, prod },
+        financials: null
+      };
+
+      teams.push(newTeam);
+      nameInput.value = "";
+      codeInput.value = "";
+
+      calculateAllTeams();
+      renderTeacherTeamsList();
+      alert(`Equipe "${name}" computada com sucesso! Decisões: Frete [${frete}], Mkt [${mkt}], Produto [${prod}].`);
+    }
+
+    // MODAL DO PROFESSOR
     function openTeacherModal() {
       document.getElementById('modal-teacher').classList.remove('hidden');
     }
@@ -951,18 +996,27 @@
       if (!container) return;
       container.innerHTML = '';
 
-      teams.forEach(t => {
+      teams.forEach((t, i) => {
         const div = document.createElement('div');
-        div.className = "p-3 rounded-xl bg-gray-800/80 border border-gray-700 text-xs space-y-1";
+        div.className = "p-3 rounded-xl bg-gray-800/80 border border-gray-700 text-xs flex items-center justify-between";
         div.innerHTML = `
-          <div class="flex items-center justify-between font-bold text-white">
-            <span>${t.name} (${t.members})</span>
-            <span class="text-violet-400 font-mono">Escolhas: ${t.decisions ? `${t.decisions.frete}-${t.decisions.mkt}-${t.decisions.prod}` : 'Não enviou'}</span>
+          <div>
+            <span class="font-bold text-white block">${t.name}</span>
+            <span class="text-gray-400">${t.members || ''}</span>
           </div>
-          <p class="text-gray-400 italic">"${t.argument || 'Sem justificativa redigida.'}"</p>
+          <div class="text-right">
+            <span class="text-violet-400 font-mono font-bold block">${t.decisions ? `[${t.decisions.frete}-${t.decisions.mkt}-${t.decisions.prod}]` : 'Sem decisões'}</span>
+            <button onclick="removeTeam(${i})" class="text-[10px] text-rose-400 hover:underline">Remover</button>
+          </div>
         `;
         container.appendChild(div);
       });
+    }
+
+    function removeTeam(index) {
+      teams.splice(index, 1);
+      calculateAllTeams();
+      renderTeacherTeamsList();
     }
 
     function setEvent(eventId) {
@@ -978,23 +1032,14 @@
       renderLeaderboard();
       closeTeacherModal();
       switchTab('results');
-      alert("Demonstrativos recalculados e Pódio Oficial publicado com sucesso!");
     }
 
     function resetAllTeams() {
-      if (confirm("Deseja realmente zerar as decisões de todos os grupos?")) {
-        teams.forEach(t => {
-          t.decisions = null;
-          t.financials = null;
-          t.argument = "";
-        });
-        currentMarketEvent = 0;
-        document.getElementById('event-title').textContent = "Aguardando sorteio da Mesa Diretora...";
-        document.getElementById('event-desc').textContent = "O professor efetuará o sorteio da conjuntura econômica no painel restrito.";
+      if (confirm("Deseja apagar todos os grupos computados?")) {
+        teams = [];
         calculateAllTeams();
         renderLeaderboard();
         renderTeacherTeamsList();
-        closeTeacherModal();
       }
     }
 
